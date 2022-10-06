@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - name: "3.1.2"
+          - version: "3.1.2"
             download-url: "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.2.tar.gz"
             sha256: "61843112389f02b735428b53bb64cf988ad9fb81858b8248e22e57336f24a83e"
         arch:
@@ -16,6 +16,9 @@ jobs:
 
           - id: "aarch64-linux-gnu"
             slug: "aarch64-linux"
+
+          - id: "x86_64-linux-gnu"
+            slug: "x86_64-linux"
 
     steps:
       - uses: actions/checkout@v3
@@ -30,13 +33,13 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gcc-${{ matrix.arch.id }} binutils-${{ matrix.arch.id }}
           wget -O ruby.tar.gz ${{ matrix.ruby.download-url }}
           echo "${{ matrix.ruby.sha256 }} *ruby.tar.gz" | sha256sum --check --strict
-          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }} ./ruby 
+          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.version }}-${{ matrix.arch.slug }} ./ruby 
           tar -xf ruby.tar.gz -C ./ruby --strip-components=1
           rm ruby.tar.gz
 
       - name: Cross Compile Ruby
         run: |
-          install_dir="/opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }}"
+          install_dir="/opt/rubies/ruby-${{ matrix.ruby.version }}-${{ matrix.arch.slug }}"
           cd ./ruby
           ./autogen.sh
           ./configure \
@@ -49,11 +52,12 @@ jobs:
             --disable-install-doc \
             --enable-install-static-library \
             --with-ext=
-          make install
-          cd /upload
-          tar -czvf ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }}.tar "$install_dir"
+          make -j$(nproc) install
+          mkdir /tmp/upload
+          cd /tmp/upload
+          tar -czvf ruby-${{ matrix.ruby.version }}-${{ matrix.arch.slug }}.tar "$install_dir"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          path: /upload
+          path: /tmp/upload
