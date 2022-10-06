@@ -30,14 +30,14 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gcc-${{ matrix.arch.id }} binutils-${{ matrix.arch.id }}
           wget -O ruby.tar.gz ${{ matrix.ruby.download-url }}
           echo "${{ matrix.ruby.sha256 }} *ruby.tar.gz" | sha256sum --check --strict
-          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }} /usr/src/ruby
-          tar -xf ruby.tar.gz -C /usr/src/ruby --strip-components=1
+          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }} ./ruby 
+          tar -xf ruby.tar.gz -C ./ruby --strip-components=1
           rm ruby.tar.gz
 
       - name: Cross Compile Ruby
         run: |
           install_dir="/opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }}"
-          cd /usr/src/ruby
+          cd ./ruby
           ./autogen.sh
           ./configure \
             --prefix="$install_dir" \
