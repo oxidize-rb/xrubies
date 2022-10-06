@@ -56,6 +56,7 @@ jobs:
 
           echo "::set-output name=build_dir::$build_dir"
           echo "::set-output name=install_dir::$install_dir"
+          echo "::set-output name=upload_dir::$upload_dir"
           echo "::set-output name=slug::$slug"
           echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
           echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
@@ -99,6 +100,5 @@ jobs:
       - name: "Upload build"
         uses: "actions/upload-artifact@v3"
         with:
-          path: |
-            ${{ steps.vars.outputs.tarball_path }}
-            ${{ steps.vars.outputs.sha256_path }}
+          name: "${{ steps.vars.outputs.slug }}"
+          path: "${{ steps.vars.outputs.upload_dir }}"
