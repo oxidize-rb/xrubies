@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: "Ruby ${{ matrix.ruby.version }} on ${{ matrix.arch.slug }}"
+    name: "Build (${{ matrix.arch.slug }}, ${{ matrix.ruby.minor }})"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
@@ -78,7 +78,7 @@ jobs:
       - name: "Build Ruby"
         run: |
           cd ${{ steps.vars.outputs.build_dir }}
-          ./autogen.sh
+          autoreconf
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
             --target="${{ matrix.arch.id }}" \
