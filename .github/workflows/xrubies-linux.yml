@@ -1,10 +1,11 @@
 on:
-  - push
-  - workflow_dispatch
+  - "push"
+  - "workflow_dispatch"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: "Ruby ${{ matrix.ruby.version }} on ${{ matrix.arch.slug }}"
+    runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
       matrix:
@@ -39,10 +40,10 @@ jobs:
             build_deps: "gcc binutils"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: "actions/checkout@v3"
 
-      - name: Set vars
-        id: vars
+      - name: "Set vars"
+        id: "vars"
         run: |
           slug="ruby-${{ matrix.ruby.version }}-${{ matrix.arch.slug }}"
           build_dir="/tmp/build/$slug"
@@ -51,29 +52,29 @@ jobs:
 
           mkdir -p "$build_dir" "$install_dir" "$upload_dir"
 
-          echo "::set-output name=build_dir::\"$build_dir\""
-          echo "::set-output name=install_dir::\"$install_dir\""
-          echo "::set-output name=slug::\"$slug\""
-          echo "::set-output name=tarball_path::\"$upload_dir/$slug.tar.gz\""
-          echo "::set-output name=sha256_path::\"$upload_dir/$slug.sha256\""
+          echo "::set-output name=build_dir::$build_dir"
+          echo "::set-output name=install_dir::"$install_dir"
+          echo "::set-output name=slug::$slug"
+          echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
+          echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
 
-      - uses: ruby/setup-ruby@v1
+      - uses: "ruby/setup-ruby@v1"
         with:
           ruby-version: "3.1"
 
-      - name: Download Ruby
+      - name: "Download Ruby"
         run: |
           wget -O ruby.tar.gz "https://cache.ruby-lang.org/pub/ruby/${{ matrix.ruby.minor }}/ruby-${{ matrix.ruby.version }}.tar.gz"
           echo "${{ matrix.ruby.sha256 }} *ruby.tar.gz" | sha256sum --check --strict
           tar -xf ruby.tar.gz -C ${{ steps.vars.outputs.build_dir }} --strip-components=1
           rm ruby.tar.gz
 
-      - name: Install deps
+      - name: "Install deps"
         run: |
           sudo apt-get update && sudo apt-get install -y ${{ matrix.arch.build_deps }}
 
-      - name: Build Ruby
-        working-directory: ${{ steps.vars.outputs.build_dir }}
+      - name: "Build Ruby"
+        working-directory: "${{ steps.vars.outputs.build_dir }}"
         run: |
           ./autogen.sh
           ./configure \
@@ -88,13 +89,13 @@ jobs:
             --with-ext=
           make -j$(nproc) install
 
-      - name: Make tarball
+      - name: "Make tarball"
         run: |
           tar -czvf ${{ steps.vars.outputs.tarball_path }} "${{ steps.vars.outputs.install_dir }}"
           sha256sum ${{ steps.vars.outputs.tarball_path }} > ${{ steps.vars.outputs.sha256_path }}
 
-      - name: Upload build
-        uses: actions/upload-artifact@v3
+      - name: "Upload build"
+        uses: "actions/upload-artifact@v3"
         with:
           path: |
             ${{ steps.vars.outputs.tarball_path }}
