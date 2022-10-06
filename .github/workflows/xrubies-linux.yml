@@ -1,3 +1,5 @@
+name: "xrubies-linux"
+
 on:
   - "push"
   - "workflow_dispatch"
@@ -74,8 +76,8 @@ jobs:
           sudo apt-get update && sudo apt-get install -y ${{ matrix.arch.build_deps }}
 
       - name: "Build Ruby"
-        working-directory: "${{ steps.vars.outputs.build_dir }}"
         run: |
+          cd ${{ steps.vars.outputs.build_dir }}
           ./autogen.sh
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
