@@ -53,7 +53,7 @@ jobs:
           mkdir -p "$build_dir" "$install_dir" "$upload_dir"
 
           echo "::set-output name=build_dir::$build_dir"
-          echo "::set-output name=install_dir::"$install_dir"
+          echo "::set-output name=install_dir::$install_dir"
           echo "::set-output name=slug::$slug"
           echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
           echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
