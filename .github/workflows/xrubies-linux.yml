@@ -7,27 +7,53 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - name: "3.1"
+          - name: "3.1.2"
             download-url: "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.2.tar.gz"
             sha256: "61843112389f02b735428b53bb64cf988ad9fb81858b8248e22e57336f24a83e"
-        arch: ["arm-linux"]
+        arch:
+          - id: "arm-linux-gnueabihf"
+            slug: "arm-linux"
+
+          - id: "aarch64-linux-gnu"
+            slug: "aarch64-linux"
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cross compile
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+
+      - name: Download Ruby
         run: |
-          wget -O ruby.tar.xz ${{ matrix.download-url }}
-          echo "${{ matrix.ruby.sha256 }} *ruby.tar.xz" | sha256sum --check --strict
-          install_dir="/opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch }}"
-          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch }}
-          tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1
-          rm ruby.tar.xz
+          set -ex
+          sudo apt-get update && sudo apt-get install -y gcc-${{ matrix.arch.id }} binutils-${{ matrix.arch.id }}
+          wget -O ruby.tar.gz ${{ matrix.ruby.download-url }}
+          echo "${{ matrix.ruby.sha256 }} *ruby.tar.gz" | sha256sum --check --strict
+          mkdir -p /opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }} /usr/src/ruby
+          tar -xf ruby.tar.gz -C /usr/src/ruby --strip-components=1
+          rm ruby.tar.gz
+
+      - name: Cross Compile Ruby
+        run: |
+          install_dir="/opt/rubies/ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }}"
           cd /usr/src/ruby
           ./autogen.sh
           ./configure \
-            --target=${{ matrix.arch }}
-            --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')"
-            --enable-shared
-            --disable-install-doc
-            --enable-install-static-library
+            --prefix="$install_dir" \
+            --target="${{ matrix.arch.id }}" \
+            --host="${{ matrix.arch.id }}" \
+            --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')" \
+            --enable-shared \
+            --disable-jit-support \
+            --disable-install-doc \
+            --enable-install-static-library \
             --with-ext=
+          make install
+          cd /upload
+          tar -czvf ruby-${{ matrix.ruby.name }}-${{ matrix.arch.slug }}.tar "$install_dir"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: /upload
