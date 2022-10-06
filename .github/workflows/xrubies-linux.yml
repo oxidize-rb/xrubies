@@ -29,17 +29,20 @@ jobs:
             sha256: "8a78fd7a221b86032f96f25c1d852954c94d193b9d21388a9b434e160b7ed891"
 
         arch:
-          - id: "arm-linux-gnueabihf"
-            slug: "arm-linux"
-            build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
+          # - id: "arm-linux-gnueabihf"
+          #   slug: "arm-linux"
+          #   build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
+          #   dpkg_arch: "armhf"
 
           - id: "aarch64-linux-gnu"
             slug: "aarch64-linux"
             build_deps: "gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
+            dpkg_arch: "arm64"
 
-          - id: "x86_64-linux-gnu"
-            slug: "x86_64-linux"
-            build_deps: "gcc binutils"
+          # - id: "x86_64-linux-gnu"
+          #   slug: "x86_64-linux"
+          #   build_deps: "gcc binutils"
+          #   dpkg_arch: "x86_64"
 
     steps:
       - uses: "actions/checkout@v3"
@@ -47,7 +50,7 @@ jobs:
       - name: "Set vars"
         id: "vars"
         run: |
-          slug="ruby-${{ matrix.ruby.version }}-${{ matrix.arch.slug }}"
+          slug="${{ matrix.ruby.version }}-${{ matrix.arch.slug }}"
           build_dir="/tmp/build/$slug"
           install_dir="/opt/xrubies/$slug"
           upload_dir="/tmp/upload"
@@ -61,6 +64,14 @@ jobs:
           echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
           echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
 
+      - name: "Install deps"
+        run: |
+          arch="${{ matrix.arch.dpkg_arch }}"
+          sudo dpkg --add-architecture "$arch"
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.arch.build_deps }}
+          sudo apt-get install -y libyaml-dev:$arch libgdbm-dev:$arch libreadline-dev:$arch libncurses5-dev:$arch
+
       - uses: "ruby/setup-ruby@v1"
         with:
           ruby-version: "3.1"
@@ -72,11 +83,9 @@ jobs:
           tar -xf ruby.tar.gz -C ${{ steps.vars.outputs.build_dir }} --strip-components=1
           rm ruby.tar.gz
 
-      - name: "Install deps"
-        run: |
-          sudo apt-get update && sudo apt-get install -y ${{ matrix.arch.build_deps }}
-
       - name: "Build Ruby"
+        env:
+          CPPFLAGS: "-DENABLE_PATH_CHECK=0" # https://github.com/actions/virtual-environments/issues/267
         run: |
           cd ${{ steps.vars.outputs.build_dir }}
           autoreconf
