@@ -29,20 +29,19 @@ jobs:
             sha256: "8a78fd7a221b86032f96f25c1d852954c94d193b9d21388a9b434e160b7ed891"
 
         arch:
-          # - id: "arm-linux-gnueabihf"
-          #   slug: "arm-linux"
-          #   build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
-          #   dpkg_arch: "armhf"
+          - id: "arm-linux-gnueabihf"
+            slug: "arm-linux"
+            build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
+            dpkg_arch: "armhf"
 
           - id: "aarch64-linux-gnu"
             slug: "aarch64-linux"
-            build_deps: "gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
-            dpkg_arch: "arm64"
+            build_deps: "g++-aarch64-linux-gnu gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
 
-          # - id: "x86_64-linux-gnu"
-          #   slug: "x86_64-linux"
-          #   build_deps: "gcc binutils"
-          #   dpkg_arch: "x86_64"
+          - id: "x86_64-linux-gnu"
+            slug: "x86_64-linux"
+            build_deps: "gcc binutils"
+            dpkg_arch: "x86_64"
 
     steps:
       - uses: "actions/checkout@v3"
@@ -54,6 +53,8 @@ jobs:
           build_dir="/tmp/build/$slug"
           install_dir="/opt/xrubies/$slug"
           upload_dir="/tmp/upload"
+          deb_host_arch="$(dpkg-architecture --target-type ${{ matrix.arch.id}} -qDEB_HOST_ARCH)"
+          deb_target_arch="$(dpkg-architecture --target-type ${{ matrix.arch.id}} -qDEB_TARGET_ARCH)"
 
           mkdir -p "$build_dir" "$install_dir" "$upload_dir"
 
@@ -63,14 +64,39 @@ jobs:
           echo "::set-output name=slug::$slug"
           echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
           echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
+          echo "::set-output name=deb_target_arch::$deb_target_arch"
+          echo "::set-output name=deb_host_arch::$deb_host_arch"
 
       - name: "Install deps"
         run: |
-          arch="${{ matrix.arch.dpkg_arch }}"
-          sudo dpkg --add-architecture "$arch"
+          set -ex
+
+          target_dpkg_arch="${{ steps.vars.outputs.deb_target_arch }}"
+          base_dpkg_arch="${{ steps.vars.outputs.deb_host_arch }}"
+
+          # Add arch support for target so we can install libs
+          sudo dpkg --add-architecture "$target_dpkg_arch"
+
+          # Qualify our current source lists to make sure debian doesn't infer stuff
+          sed -i "s/^deb http/deb [arch=$base_dpkg_arch] http/" /etc/apt/sources.list
+
+          # Add sources for ported target libs
+          echo "deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs) main universe restricted multiverse" >> /etc/apt/sources.list
+          echo "deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-updates main universe restricted multiverse" >> /etc/apt/sources.list
+          echo "deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-security main universe restricted multiverse" >> /etc/apt/sources.list
+
           sudo apt-get update
-          sudo apt-get install -y ${{ matrix.arch.build_deps }}
-          sudo apt-get install -y libyaml-dev:$arch libgdbm-dev:$arch libreadline-dev:$arch libncurses5-dev:$arch
+
+          sudo apt-get install -qq \
+            ${{ matrix.arch.build_deps }}
+
+          find /usr -name aarch64-linux-gnu-ld
+
+          sudo apt-get install -qq \
+            libyaml-dev:$target_dpkg_arch \
+            libgdbm-dev:$target_dpkg_arch \
+            libreadline-dev:$target_dpkg_arch \
+            libncurses5-dev:$target_dpkg_arch
 
       - uses: "ruby/setup-ruby@v1"
         with:
@@ -86,9 +112,15 @@ jobs:
       - name: "Build Ruby"
         env:
           CPPFLAGS: "-DENABLE_PATH_CHECK=0" # https://github.com/actions/virtual-environments/issues/267
+          CFLAGS: "-pipe"
+          CC: "${{ matrix.arch.id }}-gcc"
+          LD: "${{ matrix.arch.id }}-ld"
+          AR: "${{ matrix.arch.id }}-ar"
         run: |
           cd ${{ steps.vars.outputs.build_dir }}
+
           autoreconf
+
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
             --target="${{ matrix.arch.id }}" \
@@ -98,7 +130,7 @@ jobs:
             --disable-jit-support \
             --disable-install-doc \
             --enable-install-static-library \
-            --with-ext=
+            --enable-multiarch
           make -j$(nproc) install
 
       - name: "Make tarball"
