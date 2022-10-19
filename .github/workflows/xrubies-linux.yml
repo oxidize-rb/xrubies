@@ -142,6 +142,7 @@ jobs:
             --disable-jit-support \
             --disable-install-doc \
             --enable-install-static-library \
+            --with-static-linked-ext \
             --enable-multiarch
           make -j$(nproc) install
 
