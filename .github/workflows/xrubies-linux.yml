@@ -78,7 +78,7 @@ jobs:
           sudo dpkg --add-architecture "$target_dpkg_arch"
 
           # Qualify our current source lists to make sure debian doesn't infer stuff
-          sed -i "s/^deb http/deb [arch=$base_dpkg_arch] http/" /etc/apt/sources.list
+          sudo sed -i "s/^deb http/deb [arch=$base_dpkg_arch] http/" /etc/apt/sources.list
 
           # Add sources for ported target libs
           echo "deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs) main universe restricted multiverse" >> /etc/apt/sources.list
