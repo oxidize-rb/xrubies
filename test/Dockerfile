@@ -1,0 +1,21 @@
+FROM debian:stable
+
+ARG RUBY_VERSION
+ARG RUBY_PLATFORM
+ARG EXPECTED_RUBY_ARCH
+
+ENV \
+  RUBY_VERSION=${RUBY_VERSION} \
+  RUBY_PLATFORM=${RUBY_PLATFORM} \
+  EXPECTED_RUBY_ARCH=${EXPECTED_RUBY_ARCH} \
+  PATH=/opt/xrubies/${RUBY_VERSION}-${RUBY_PLATFORM}/bin:$PATH
+
+# Install ruby
+ADD tmp/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz /
+
+# Info
+RUN ruby -v 
+
+# Tests
+ADD test/ test/
+RUN ruby test/tests.rb

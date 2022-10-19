@@ -33,15 +33,18 @@ jobs:
             slug: "arm-linux"
             build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
             dpkg_arch: "armhf"
+            docker_platform: "linux/arm/v7"
 
           - id: "aarch64-linux-gnu"
             slug: "aarch64-linux"
             build_deps: "g++-aarch64-linux-gnu gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
+            docker_platform: "linux/arm64/v8"
 
           - id: "x86_64-linux-gnu"
             slug: "x86_64-linux"
             build_deps: "gcc binutils"
             dpkg_arch: "x86_64"
+            docker_platform: "linux/amd64"
 
     steps:
       - uses: "actions/checkout@v3"
@@ -142,6 +145,23 @@ jobs:
         run: |
           tar -czvf ${{ steps.vars.outputs.tarball_path }} "${{ steps.vars.outputs.install_dir }}"
           sha256sum ${{ steps.vars.outputs.tarball_path }} > ${{ steps.vars.outputs.sha256_path }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Run tests
+        run: |
+          mkdir -p ./tmp && cp ${{ steps.vars.outputs.tarball_path }} ./tmp
+          docker buildx create --use 
+          docker buildx build \
+            --platform=${{ matrix.arch.docker_platform }} \
+            --build-arg RUBY_VERSION=${{ matrix.ruby.version }} \
+            --build-arg RUBY_PLATFORM=${{ matrix.arch.slug }} \
+            --build-arg EXPECTED_RUBY_ARCH=${{ matrix.arch.id }} \
+            -f test/Dockerfile .
 
       - name: "Upload build"
         uses: "actions/upload-artifact@v3"
