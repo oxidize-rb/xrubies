@@ -165,6 +165,7 @@ jobs:
             --build-arg RUBY_VERSION=${{ matrix.ruby.version }} \
             --build-arg RUBY_PLATFORM=${{ matrix.arch.slug }} \
             --build-arg EXPECTED_RUBY_ARCH=${{ matrix.arch.id }} \
+            --build-arg EXPECTED_RUBY_VERSION=${{ matrix.ruby.expected_version }} \
             -f test/Dockerfile .
 
       - name: "Upload build"
