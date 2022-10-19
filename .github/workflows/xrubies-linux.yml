@@ -58,14 +58,14 @@ jobs:
 
           mkdir -p "$build_dir" "$install_dir" "$upload_dir"
 
-          echo "::set-output name=build_dir::$build_dir"
-          echo "::set-output name=install_dir::$install_dir"
-          echo "::set-output name=upload_dir::$upload_dir"
-          echo "::set-output name=slug::$slug"
-          echo "::set-output name=tarball_path::$upload_dir/$slug.tar.gz"
-          echo "::set-output name=sha256_path::$upload_dir/$slug.sha256"
-          echo "::set-output name=deb_target_arch::$deb_target_arch"
-          echo "::set-output name=deb_host_arch::$deb_host_arch"
+          echo "build_dir=$build_dir" >> $GITHUB_OUTPUT
+          echo "install_dir=$install_dir" >> $GITHUB_OUTPUT
+          echo "upload_dir=$upload_dir" >> $GITHUB_OUTPUT
+          echo "slug=$slug" >> $GITHUB_OUTPUT
+          echo "tarball_path=$upload_dir/$slug.tar.gz" >> $GITHUB_OUTPUT
+          echo "sha256_path=$upload_dir/$slug.sha256" >> $GITHUB_OUTPUT
+          echo "deb_target_arch=$deb_target_arch" >> $GITHUB_OUTPUT
+          echo "deb_host_arch=$deb_host_arch" >> $GITHUB_OUTPUT
 
       - name: "Install deps"
         run: |
@@ -74,29 +74,34 @@ jobs:
           target_dpkg_arch="${{ steps.vars.outputs.deb_target_arch }}"
           base_dpkg_arch="${{ steps.vars.outputs.deb_host_arch }}"
 
-          # Add arch support for target so we can install libs
-          sudo dpkg --add-architecture "$target_dpkg_arch"
+          if [ "$target_dpkg_arch" != "$base_dpkg_arch" ]; then
+            # Add arch support for target so we can install libs
+            sudo dpkg --add-architecture "$target_dpkg_arch"
 
-          # Qualify our current source lists to make sure debian doesn't infer stuff
-          sudo sed -i "s/^deb http/deb [arch=$base_dpkg_arch] http/" /etc/apt/sources.list
+            # Qualify our current source lists to make sure debian doesn't infer stuff
+            sudo sed -i "s/^deb http/deb [arch=$base_dpkg_arch] http/" /etc/apt/sources.list
 
-          # Add sources for ported target libs
-          sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs) main universe restricted multiverse\" >> /etc/apt/sources.list"
-          sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-updates main universe restricted multiverse\" >> /etc/apt/sources.list"
-          sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-security main universe restricted multiverse\" >> /etc/apt/sources.list"
+            # Add sources for ported target libs
+            sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs) main universe restricted multiverse\" >> /etc/apt/sources.list"
+            sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-updates main universe restricted multiverse\" >> /etc/apt/sources.list"
+            sudo sh -c "echo \"deb [arch=$target_dpkg_arch] http://ports.ubuntu.com/ubuntu-ports $(lsb_release -cs)-security main universe restricted multiverse\" >> /etc/apt/sources.list"
 
-          sudo apt-get update
+            sudo apt-get update
 
-          sudo apt-get install -qq \
-            ${{ matrix.arch.build_deps }}
+            sudo apt-get install -qq \
+              libyaml-dev:$target_dpkg_arch \
+              libgdbm-dev:$target_dpkg_arch \
+              libreadline-dev:$target_dpkg_arch \
+              libncurses5-dev:$target_dpkg_arch
+          else
+            sudo apt-get install -qq \
+              libyaml-dev \
+              libgdbm-dev \
+              libreadline-dev \
+              libncurses5-dev
+          fi
 
-          find /usr -name aarch64-linux-gnu-ld
-
-          sudo apt-get install -qq \
-            libyaml-dev:$target_dpkg_arch \
-            libgdbm-dev:$target_dpkg_arch \
-            libreadline-dev:$target_dpkg_arch \
-            libncurses5-dev:$target_dpkg_arch
+          sudo apt-get install -qq ${{ matrix.arch.build_deps }}
 
       - uses: "ruby/setup-ruby@v1"
         with:
