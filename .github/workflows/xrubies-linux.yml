@@ -96,12 +96,16 @@ jobs:
             sudo apt-get update
 
             sudo apt-get install -qq \
+              zlib1g-dev:$target_dpkg_arch \
+              libssl-dev:$target_dpkg_arch \
               libyaml-dev:$target_dpkg_arch \
               libgdbm-dev:$target_dpkg_arch \
               libreadline-dev:$target_dpkg_arch \
               libncurses5-dev:$target_dpkg_arch
           else
             sudo apt-get install -qq \
+              zlib1g-dev \
+              libssl-dev \
               libyaml-dev \
               libgdbm-dev \
               libreadline-dev \
@@ -138,12 +142,12 @@ jobs:
             --target="${{ matrix.arch.id }}" \
             --host="${{ matrix.arch.id }}" \
             --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')" \
-            --enable-shared \
             --disable-jit-support \
             --disable-install-doc \
             --enable-install-static-library \
             --with-static-linked-ext \
             --enable-multiarch
+
           make -j$(nproc) install
 
       - name: "Make tarball"
