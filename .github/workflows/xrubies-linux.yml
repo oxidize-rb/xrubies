@@ -15,18 +15,22 @@ jobs:
           - version: "3.1.2"
             minor: "3.1"
             sha256: "61843112389f02b735428b53bb64cf988ad9fb81858b8248e22e57336f24a83e"
+            expected_version: "3.1.2"
 
           - version: "3.0.4"
             minor: "3.0"
             sha256: "70b47c207af04bce9acea262308fb42893d3e244f39a4abc586920a1c723722b"
+            expected_version: "3.0.4"
 
           - version: "2.7.6"
             minor: "2.7"
             sha256: "e7203b0cc09442ed2c08936d483f8ac140ec1c72e37bb5c401646b7866cb5d10"
+            expected_version: "2.7.6"
 
           - version: "3.2.0-preview2"
             minor: "3.2"
             sha256: "8a78fd7a221b86032f96f25c1d852954c94d193b9d21388a9b434e160b7ed891"
+            expected_version: "3.2.0+1"
 
         arch:
           - id: "arm-linux-gnueabihf"

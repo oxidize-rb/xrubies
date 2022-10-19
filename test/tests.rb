@@ -20,7 +20,7 @@ it "is compiled for the expected architecture" do
 end
 
 it "is the expected version of ruby" do
-  assert_equal(ENV["RUBY_VERSION"], [RB["MAJOR"], RB["MINOR"], RB["TEENY"]].join("."))
+  assert_equal(ENV["EXPECTED_RUBY_VERSION"], RB["RUBY_PROGRAM_VERSION"])
 end
 
 warn "✅ All tests passed!"
