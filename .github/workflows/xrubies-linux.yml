@@ -147,8 +147,6 @@ jobs:
             --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')" \
             --disable-jit-support \
             --disable-install-doc \
-            # --enable-shared \
-            # --enable-install-static-library \
             --with-static-linked-ext \
             --enable-multiarch
 
