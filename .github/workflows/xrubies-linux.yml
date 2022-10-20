@@ -198,7 +198,7 @@ jobs:
           mkdir /tmp/mega
           cd /tmp/mega
 
-          for zip in ${{steps.download.outputs.download-path}}/**/*.zip; do
+          for zip in $(find ${{steps.download.outputs.download-path}} -name '*.zip'); do
             echo "Processing $zip"
             unzip $zip
             tar xf *.tar.gz
