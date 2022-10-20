@@ -195,8 +195,14 @@ jobs:
 
       - name: Make mega bundle
         run: |
-          for tarball in ${{steps.download.outputs.download-path}}/**/*.tar.gz; do
-            tar -xf "$tarball"
+          mkdir /tmp/mega
+          cd /tmp/mega
+
+          for zip in ${{steps.download.outputs.download-path}}/**/*.zip; do
+            echo "Processing $zip"
+            unzip $zip
+            tar xf *.tar.gz
+            rm $zip *.tar.gz *.sha256
           done
 
           mkdir /opt/xrubies/.rake-compiler-dock
