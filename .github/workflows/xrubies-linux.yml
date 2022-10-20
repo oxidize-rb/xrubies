@@ -120,7 +120,7 @@ jobs:
 
       - name: "Download Ruby"
         run: |
-          wget -O ruby.tar.gz "https://cache.ruby-lang.org/pub/ruby/${{ matrix.ruby.minor }}/ruby-${{ matrix.ruby.version }}.tar.gz"
+          wget --quiet -O ruby.tar.gz "https://cache.ruby-lang.org/pub/ruby/${{ matrix.ruby.minor }}/ruby-${{ matrix.ruby.version }}.tar.gz"
           echo "${{ matrix.ruby.sha256 }} *ruby.tar.gz" | sha256sum --check --strict
           tar -xf ruby.tar.gz -C ${{ steps.vars.outputs.build_dir }} --strip-components=1
           rm ruby.tar.gz
@@ -135,9 +135,6 @@ jobs:
         run: |
           cd ${{ steps.vars.outputs.build_dir }}
           autoreconf
-
-          find /usr -name '*libyaml*' || true
-
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
             --target="${{ matrix.arch.id }}" \
@@ -147,6 +144,7 @@ jobs:
             --disable-install-doc \
             --enable-shared \
             --enable-install-static-library \
+            --enable-multiarch \
             --with-opt-dir=/usr/lib/${{ matrix.arch.id }}
 
           make -j$(nproc) install

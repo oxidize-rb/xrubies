@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM buildpack-deps
 
 ARG RUBY_VERSION
 ARG RUBY_PLATFORM
