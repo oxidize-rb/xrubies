@@ -137,9 +137,6 @@ jobs:
 
           autoreconf
 
-          # sed -i -E 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
-          sed -i -E 's/#option nodynamic/option nodynamic/' ext/Setup
-          cat ext/Setup
 
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
@@ -148,7 +145,8 @@ jobs:
             --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')" \
             --disable-jit-support \
             --disable-install-doc \
-            --with-static-linked-ext \
+            --enable-shared \
+            --enable-install-static-library \
             --enable-multiarch
 
           make -j$(nproc) install

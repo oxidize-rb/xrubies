@@ -12,6 +12,16 @@ ENV \
   EXPECTED_RUBY_ARCH=${EXPECTED_RUBY_ARCH} \
   EXPECTED_RUBY_VERSION=${EXPECTED_RUBY_VERSION}
 
+RUN set -ex; \
+  apt-get update; \
+  apt-get install -y -qq \
+  zlib1g-dev \
+  libssl-dev \
+  libyaml-dev \
+  libgdbm-dev \
+  libreadline-dev \
+  libncurses5-dev;
+
 # Install ruby
 ADD tmp/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz /
 
