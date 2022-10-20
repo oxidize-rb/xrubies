@@ -191,7 +191,8 @@ jobs:
       - name: "Echo download path"
         run: |
           echo ${{steps.download.outputs.download-path}}
-          ls ${{steps.download.outputs.download-path}}
+          ls ${{steps.download.outputs.download-path}}/
+          find ${{steps.download.outputs.download-path}}
 
       - name: Make mega bundle
         run: |
