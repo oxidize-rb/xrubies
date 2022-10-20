@@ -136,7 +136,7 @@ jobs:
           cd ${{ steps.vars.outputs.build_dir }}
           autoreconf
 
-          find / -name '*libyaml*'
+          find /usr -name '*libyaml*' || true
 
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
