@@ -26,8 +26,9 @@ RUN set -ex; \
 ADD tmp/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz /
 
 # Info
-RUN ruby -v 
+RUN ruby -v && gem -v && bundle -v
 
 # Tests
+RUN gem install minitest nokogiri
 ADD test/ test/
 RUN ruby test/tests.rb

@@ -2,25 +2,21 @@ require "rbconfig"
 
 RB = RbConfig::CONFIG
 
-def it(name, &blk)
-  $stderr.printf "Running #{name.inspect}... "
-  blk.call
-  warn "OK\n"
-rescue => e
-  puts "FAIL: #{name}"
-  raise e
-end
+require "minitest/autorun"
+require "minitest/spec"
 
-def assert_equal(a, b)
-  raise "Expected #{a.inspect} to equal #{b.inspect}" unless a == b
-end
+describe RB do
+  it "is compiled for the expected architecture" do
+    assert_equal(ENV["EXPECTED_RUBY_ARCH"], RB["arch"])
+  end
 
-it "is compiled for the expected architecture" do
-  assert_equal(ENV["EXPECTED_RUBY_ARCH"], RB["arch"])
-end
+  it "is the expected version of ruby" do
+    assert_equal(ENV["EXPECTED_RUBY_VERSION"], RB["RUBY_PROGRAM_VERSION"])
+  end
 
-it "is the expected version of ruby" do
-  assert_equal(ENV["EXPECTED_RUBY_VERSION"], RB["RUBY_PROGRAM_VERSION"])
+  it "works with compiled gems" do
+    require "nokogiri"
+    doc = Nokogiri::HTML("<html><body><h1>Hello, world!</h1></body></html>")
+    assert_equal("Hello, world!", doc.at("h1").text)
+  end
 end
-
-warn "✅ All tests passed!"

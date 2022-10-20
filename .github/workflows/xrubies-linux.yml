@@ -135,6 +135,9 @@ jobs:
         run: |
           cd ${{ steps.vars.outputs.build_dir }}
           autoreconf
+
+          find / -name '*libyaml*'
+
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
             --target="${{ matrix.arch.id }}" \
@@ -144,7 +147,7 @@ jobs:
             --disable-install-doc \
             --enable-shared \
             --enable-install-static-library \
-            --enable-multiarch
+            --with-opt-dir=/usr/lib/${{ matrix.arch.id }}
 
           make -j$(nproc) install
 
