@@ -137,7 +137,8 @@ jobs:
 
           autoreconf
 
-          sed -i -E 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
+          # sed -i -E 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
+          sed -i -E 's/#option nodynamic/option nodynamic/' ext/Setup
           cat ext/Setup
 
           ./configure \
