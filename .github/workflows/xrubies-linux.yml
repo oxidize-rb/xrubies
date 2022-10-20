@@ -33,16 +33,16 @@ jobs:
             expected_version: "3.2.0"
 
         arch:
-          - id: "arm-linux-gnueabihf"
-            slug: "arm-linux"
-            build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
-            dpkg_arch: "armhf"
-            docker_platform: "linux/arm/v7"
+          # - id: "arm-linux-gnueabihf"
+          #   slug: "arm-linux"
+          #   build_deps: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
+          #   dpkg_arch: "armhf"
+          #   docker_platform: "linux/arm/v7"
 
-          - id: "aarch64-linux-gnu"
-            slug: "aarch64-linux"
-            build_deps: "g++-aarch64-linux-gnu gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
-            docker_platform: "linux/arm64/v8"
+          # - id: "aarch64-linux-gnu"
+          #   slug: "aarch64-linux"
+          #   build_deps: "g++-aarch64-linux-gnu gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
+          #   docker_platform: "linux/arm64/v8"
 
           - id: "x86_64-linux-gnu"
             slug: "x86_64-linux"
@@ -56,7 +56,7 @@ jobs:
       - name: "Set vars"
         id: "vars"
         run: |
-          slug="${{ matrix.ruby.version }}-${{ matrix.arch.slug }}"
+          slug="${{ matrix.arch.slug }}-${{ matrix.ruby.version }}"
           build_dir="/tmp/build/$slug"
           install_dir="/opt/xrubies/$slug"
           upload_dir="/tmp/upload"
@@ -192,6 +192,24 @@ jobs:
         run: |
           echo ${{steps.download.outputs.download-path}}
           ls ${{steps.download.outputs.download-path}}
+
+      - name: Make mega bundle
+        run: |
+          for tarball in ${{steps.download.outputs.download-path}}/**/*.tar.gz; do
+            tar -xf "$tarball"
+          done
+
+          mkdir /opt/xrubies/.rake-compiler-dock
+          touch /opt/xrubies/.rake-compiler-dock/config.yml
+
+          for rbconfig in $(find /opt/xrubies -name rbconfig.rb); do
+            echo "rbconfig-$(basename $rbconfig | sed 's/\.tar\.gz//'): $rbconfig" > /opt/xrubies/.rake-compiler-dock/config.yml
+          done
+
+          cat /opt/xrubies/.rake-compiler-dock/config.yml
+
+          tar -czvf /tmp/upload/all.tar.gz /opt/xrubies
+          sha256sum /tmp/upload/all.tar.gz > /tmp/upload/all.tar.gz.sha256
 
       - name: Create release
         uses: softprops/action-gh-release@v1
