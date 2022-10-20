@@ -29,6 +29,7 @@ ADD tmp/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz /
 RUN ruby -v && gem -v && bundle -v
 
 # Tests
+RUN ln -s /bin/mkdir /usr/bin/mkdir && echo lol
 RUN gem install minitest nokogiri
 ADD test/ test/
 RUN ruby test/tests.rb
