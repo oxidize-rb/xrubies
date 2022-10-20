@@ -137,7 +137,7 @@ jobs:
 
           autoreconf
 
-          sed -iE 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
+          sed -i -E 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
 
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
