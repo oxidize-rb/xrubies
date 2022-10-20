@@ -138,6 +138,7 @@ jobs:
           autoreconf
 
           sed -i -E 's/#(zlib|json|gdbm|psych|digest|io|openssl)/\1/' ext/Setup
+          cat ext/Setup
 
           ./configure \
             --prefix="${{ steps.vars.outputs.install_dir }}" \
@@ -146,8 +147,8 @@ jobs:
             --build="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["arch"]')" \
             --disable-jit-support \
             --disable-install-doc \
-            --enable-shared \
-            --enable-install-static-library \
+            # --enable-shared \
+            # --enable-install-static-library \
             --with-static-linked-ext \
             --enable-multiarch
 
