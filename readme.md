@@ -16,7 +16,7 @@ ARG RUBY_PLATFORM
 ENV \
   RUBY_VERSION=${RUBY_VERSION} \
   RUBY_PLATFORM=${RUBY_PLATFORM} \
-  PATH=/opt/xrubies/${RUBY_VERSION}-${RUBY_PLATFORM}/bin:$PATH
+  PATH=/opt/xrubies/${RUBY_PLATFORM}-${RUBY_VERSION}/bin:$PATH
 
 RUN apt-get update && apt-get install -y -qq \
   zlib1g-dev \
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y -qq \
   libncurses5-dev;
 
 # Install ruby
-RUN curl -Lo /tmp/ruby.tar.gz https://github.com/oxidize-rb/xrubies/releases/download/v0.0.2/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz
+RUN curl -Lo /tmp/ruby.tar.gz https://github.com/oxidize-rb/xrubies/releases/download/v0.0.2/${RUBY_PLATFORM}-${RUBY_VERSION}.tar.gz
 RUN tar xf /tmp/ruby.tar.gz
 
 # Info

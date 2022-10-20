@@ -23,7 +23,7 @@ RUN set -ex; \
   libncurses5-dev;
 
 # Install ruby
-ADD tmp/${RUBY_VERSION}-${RUBY_PLATFORM}.tar.gz /
+ADD tmp/${RUBY_PLATFORM}-${RUBY_VERSION}.tar.gz /
 
 # Info
 RUN ruby -v && gem -v && bundle -v
