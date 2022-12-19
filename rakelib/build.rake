@@ -5,6 +5,10 @@ namespace :build do
     ruby.map { |k, v| "--build-arg RUBY_#{k.upcase}=#{v}" }.join(" ")
   end
 
+  def platform_build_args(platform)
+    "--build-arg RUBY_TARGET=#{platform.fetch("slug")} --build-arg RUST_TARGET=#{platform.fetch("rust-target")}"
+  end
+
   def docker_tags(platform_slug, ruby, os_tag)
     [ruby.fetch("version"), ruby.fetch("slug")].map do |ruby_version_tag|
       "ghcr.io/oxidize-rb/xrubies__#{platform_slug}__#{ruby_version_tag}:#{os_tag}"
@@ -28,6 +32,7 @@ namespace :build do
             #{DOCKER_BUILD} \
               --platform=#{image.fetch("docker-platforms").join(",")} \
               #{ruby_build_args(ruby)} \
+              #{platform_build_args(ruby_platform)} \
               #{tags_arg} \
               --build-arg BASE_IMAGE_TAG=#{image.fetch('tag')} \
               -f #{ruby_platform["dir"]}/Dockerfile \

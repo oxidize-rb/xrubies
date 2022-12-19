@@ -18,6 +18,7 @@ download_ruby() {
 
 install_deps() {
   if_centos install_packages \
+    ruby \
     zlib-devel \
     readline-devel \
     sqlite-devel \
@@ -27,7 +28,10 @@ install_deps() {
     gdbm-devel \
     ncurses-devel
 
+  if_ubuntu dpkg --add-architecture "$DEB_ARCH"
+
   if_ubuntu install_packages \
+    ruby \
     zlib1g-dev:"$DEB_ARCH" \
     libreadline-dev:"$DEB_ARCH" \
     libsqlite0-dev:"$DEB_ARCH" \
@@ -46,17 +50,20 @@ configure() {
   autoreconf
 
   env
+    CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
+    CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
+    AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
     CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong" \
     LDFLAGS="-pipe" \
       ./configure \
         --prefix="$ruby_install_dir" \
         --target="$RUBY_TARGET" \
-        --host="$(gcc -dumpmachine)" \
-        --build="$(gcc -dumpmachine)" \
+        --host="$MACHTYPE" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
-        "$@"
+        "$@" \
+      || (cat config.log && false)
 }
 
 
