@@ -1,0 +1,49 @@
+name: "Build"
+
+on:
+  - "push"
+  - "workflow_dispatch"
+
+concurrency:
+  group: "build-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  set-matrix:
+    name: "Set matrix"
+    runs-on: "ubuntu-latest"
+    outputs:
+      matrix: "${{ steps.set-matrix.outputs.matrix }}"
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - uses: "ruby/setup-ruby@v1"
+        with:
+          ruby-version: "3.1"
+
+      - id: "set-matrix"
+        run: rake github:actions:matrix
+
+  build:
+    name: "${{ matrix.name }}"
+    needs: "set-matrix"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - uses: "ruby/setup-ruby@v1"
+        with:
+          ruby-version: "3.1"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          platforms: "${{ matrix.docker-platforms }}"
+
+      - name: "Build"
+        env:
+          DOCKER_BUILD: docker buildx build --cache-to type=gha --cache-from type=gha
+        run: rake "${{ matrix.rake-task }}"

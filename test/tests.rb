@@ -1,22 +1,35 @@
 require "rbconfig"
-
-RB = RbConfig::CONFIG
-
 require "minitest/autorun"
 require "minitest/spec"
 
-describe RB do
-  it "is compiled for the expected architecture" do
-    assert_equal(ENV["EXPECTED_RUBY_ARCH"], RB["arch"])
+describe "Precompiled Ruby" do
+  it "works with bundled compiled gems (yaml)" do
+    require "yaml"
+
+    assert_equal(YAML.dump("hello" => "world"), "---\nhello: world\n")
   end
 
-  it "is the expected version of ruby" do
-    assert_equal(ENV["EXPECTED_RUBY_VERSION"], RB["RUBY_PROGRAM_VERSION"])
+  it "works with bundled compiled gems (digest)" do
+    require "digest"
+
+    assert_equal(Digest::SHA256.hexdigest("foo"), "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae")
   end
 
-  it "works with compiled gems" do
-    require "nokogiri"
-    doc = Nokogiri::HTML("<html><body><h1>Hello, world!</h1></body></html>")
-    assert_equal("Hello, world!", doc.at("h1").text)
+  it "works with bundled compiled gems (openssl)" do
+    require "openssl"
+  end
+
+  it "works with bundled compiled gems (zlib)" do
+    require "zlib"
+
+    data_to_compress = "Hello, world!"
+    data_compressed = Zlib::Deflate.deflate(data_to_compress)
+    uncompressed_data = Zlib::Inflate.inflate(data_compressed)
+
+    assert_equal(data_to_compress, uncompressed_data)
+  end
+
+  it "works with bundled compiled gems (readline)" do
+    require "readline"
   end
 end
