@@ -85,10 +85,26 @@ EOF
   "$ruby_install_dir"/bin/ruby -v
 }
 
+install_patchelf() {
+  echo "Installing patchelf" >&2
+  local td
+  td="$(mktemp -d)"
+  local cpu_type
+  cpu_type="$(uname -m)"
+  local url
+  url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
+  curl -fsSL "$url" | tar -xz -C "$td"
+
+
+  mv "$td/bin/patchelf" /usr/local/bin
+  rm -rf "$td"
+  echo "Installed patchelf: $(patchelf --version)" >&2
+}
+
 vendor_libs() {
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
-  install_packages patchelf
+  install_patchelf
 
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
@@ -117,6 +133,8 @@ vendor_libs() {
     relative_path_to_vendor_lib="$(realpath --relative-to="$(dirname "$lib")" "$ruby_install_dir"/vendor/lib)"
     patchelf --set-rpath "\$ORIGIN/$relative_path_to_vendor_lib:$(patchelf --print-rpath "$lib")" "$lib";
   done;
+
+  rm /usr/local/bin/patchelf
 }
 
 main() {
