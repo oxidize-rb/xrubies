@@ -2,11 +2,13 @@
 ruby-platform:
   - slug: "x86_64-linux"
     dir: docker/builds/x86_64-linux
-
-docker-platform:
-  - id: linux/amd64
-    slug: amd64
-
+    images:
+      - slug: "ubuntu"
+        tag: "latest"
+        docker-platforms: ["linux/amd64"]
+      - slug: "centos"
+        tag: "latest-centos"
+        docker-platforms: ["linux/amd64"]
 ruby:
   - version: "3.1.2"
     slug: "3.1"

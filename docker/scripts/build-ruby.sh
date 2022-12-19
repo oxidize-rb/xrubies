@@ -17,7 +17,17 @@ download_ruby() {
 }
 
 install_deps() {
-  install_packages \
+  if_centos install_packages \
+    zlib-devel \
+    readline-devel \
+    sqlite-devel \
+    openssl-devel \
+    libyaml-devel \
+    libffi-devel \
+    gdbm-devel \
+    ncurses-devel
+
+  if_ubuntu install_packages \
     zlib1g-dev:"$DEB_ARCH" \
     libreadline-dev:"$DEB_ARCH" \
     libsqlite0-dev:"$DEB_ARCH" \
@@ -41,8 +51,8 @@ configure() {
       ./configure \
         --prefix="$ruby_install_dir" \
         --target="$RUBY_TARGET" \
-        --host="$(dpkg-architecture --query DEB_HOST_GNU_TYPE)" \
-        --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+        --host="$(gcc -dumpmachine)" \
+        --build="$(gcc -dumpmachine)" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
