@@ -41,12 +41,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
+
       - name: "Build"
         id: "build"
-        run: |
-          cache_params="type=gha,url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN,scope=${{ matrix.cache-scope }}"
-          export DOCKER_BUILD="docker buildx build --cache-to $cache_params --cache-from $cache_params,mode=max --load"
-          rake "${{ matrix.rake-task }}"
+        env:
+          DOCKER_BUILD: "docker buildx build --cache-to type=gha,scope=${{ matrix.cache-scope }} --cache-from type-gha,scope=${{ matrix.cache-scope }},mode=max --load"
+        run: rake "${{ matrix.rake-task }}"
 
       - name: "Push"
         # if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
