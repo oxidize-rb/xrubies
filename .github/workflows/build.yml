@@ -43,7 +43,6 @@ jobs:
 
       - name: "Build"
         id: "build"
-        env:
         run: |
           cache_params="type=gha,url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN,scope=${{ matrix.cache-scope }}"
           export DOCKER_BUILD="docker buildx build --cache-to $cache_params --cache-from $cache_params,mode=max --load"
