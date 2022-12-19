@@ -24,7 +24,7 @@ namespace :github do
     desc "Generate GitHub Actions matrix"
     task :matrix do
       matrix = Rake::Task.tasks.select { |t| t.name.start_with?("build:") }.map do |t|
-        { "name" => t.name, "rake-task" => t.name }
+        { "name" => t.name, "rake-task" => t.name, "cache-scope" => t.name.gsub(":", "__") }
       end
 
      GHA.set_output(:matrix, JSON.dump(include: matrix))

@@ -44,13 +44,15 @@ jobs:
       - name: "Build"
         id: "build"
         env:
-          DOCKER_BUILD: docker buildx build --cache-to type=gha --cache-from type=gha --load
-        run: rake "${{ matrix.rake-task }}"
+        run: |
+          cache_params="type=gha,url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN,scope=${{ matrix.cache-scope }}"
+          export DOCKER_BUILD="docker buildx build --cache-to $cache_params --cache-from $cache_params,mode=max --load"
+          rake "${{ matrix.rake-task }}"
 
       - name: "Push"
         # if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
         run: |
-          tags="$(echo '${{ steps.build.outputs.docker-tags }}' | jq -r '.[]')
+          tags="$(echo '${{ steps.build.outputs.docker-tags }}' | jq -r '.[]')"
 
           for tag in $tags; do
             echo "::group::Pushing $tag"
