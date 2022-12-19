@@ -41,15 +41,6 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: "Build"
-        id: "build"
-        run: |
-          cache="type=gha,scope=${{ matrix.cache-scope }},url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN"
-          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --load"
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -57,13 +48,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Push"
-        # if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
-        run: |
-          tags="$(echo '${{ steps.build.outputs.docker-tags }}' | jq -r '.[]')"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-          for tag in $tags; do
-            echo "::group::Pushing $tag"
-            docker push "$tag"
-            echo "::endgroup::"
-          done
+      - name: "Build"
+        id: "build"
+        run: |
+          cache="type=gha,scope=${{ matrix.cache-scope }},url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN"
+          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --push"
