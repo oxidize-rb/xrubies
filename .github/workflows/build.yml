@@ -50,6 +50,13 @@ jobs:
           DOCKER_BUILD: "docker buildx build --cache-to type=gha,scope=${{ matrix.cache-scope }} --cache-from type-gha,scope=${{ matrix.cache-scope }},mode=max --load"
         run: rake "${{ matrix.rake-task }}"
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: "Push"
         # if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
         run: |
