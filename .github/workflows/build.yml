@@ -46,7 +46,6 @@ jobs:
 
       - name: "Build"
         id: "build"
-        env:
         run: |
           local cache="type=gha,scope=${{ matrix.cache-scope }},url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN"
           rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --push"
