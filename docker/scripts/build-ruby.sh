@@ -41,7 +41,7 @@ install_deps() {
     libgdbm-dev:"$DEB_ARCH" \
     libncurses5-dev:"$DEB_ARCH"
 
-  gem update --system --no-document
+  gem update --system --no-document 3.0.8
 }
 
 configure() {
