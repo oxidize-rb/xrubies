@@ -51,12 +51,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/oxidize-rb/rubies
+          tags: |
+            type=sha
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
           context: ./docker/builds/baseruby
           platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
           tags: |
             ghcr.io/oxidize-rb/rubies:${{ matrix.ruby.slug }}
             ghcr.io/oxidize-rb/rubies:${{ matrix.ruby.version }}

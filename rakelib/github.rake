@@ -5,7 +5,6 @@ module GHA
   extend self
 
   def set_output(key, value)
-
     if ENV["GITHUB_OUTPUT"]
       eol = $/
       delimiter = "ghadelimiter_#{SecureRandom.uuid}"
