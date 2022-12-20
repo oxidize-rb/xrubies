@@ -18,7 +18,6 @@ download_ruby() {
 
 install_deps() {
   if_centos install_packages \
-    ruby \
     zlib-devel \
     readline-devel \
     sqlite-devel \
@@ -31,7 +30,6 @@ install_deps() {
   if_ubuntu dpkg --add-architecture "$DEB_ARCH"
 
   if_ubuntu install_packages \
-    ruby \
     zlib1g-dev:"$DEB_ARCH" \
     libreadline-dev:"$DEB_ARCH" \
     libsqlite0-dev:"$DEB_ARCH" \
@@ -40,8 +38,6 @@ install_deps() {
     libffi-dev:"$DEB_ARCH" \
     libgdbm-dev:"$DEB_ARCH" \
     libncurses5-dev:"$DEB_ARCH"
-
-  gem update --system 3.0.8 --no-document
 }
 
 configure() {
