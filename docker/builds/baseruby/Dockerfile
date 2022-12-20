@@ -4,7 +4,7 @@ ARG RUBY_VERSION="3.1.3"
 ARG RUBY_MINOR="3.1"
 ARG RUBY_SHA256="5ea498a35f4cd15875200a52dde42b6eb179e1264e17d78732c3a57cd1c6ab9e"
 
-COPY docker/builds/baseruby/vendor-libs.sh /
+COPY vendor-libs.sh /
 
 RUN set -ex; \
   curl -fsSL -o ruby.tar.gz "https://cache.ruby-lang.org/pub/ruby/$RUBY_MINOR/ruby-$RUBY_VERSION.tar.gz"; \
