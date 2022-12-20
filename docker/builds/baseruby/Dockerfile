@@ -12,9 +12,9 @@ RUN set -ex; \
   rm ruby.tar.gz; \
   cd /usr/src/ruby; \
   ./autogen.sh; \
-  ./configure --prefix=/opt/rubies/baseruby --disable-rubygems --disable-install-doc --disable-install-rdoc --disable-install-capi --with-ext=monitor --with-static-linked-ext --disable-jit-support --disable-install-static-librar --disable-shared --disable-dln; \
-  make -j "$(nproc)" install;
+  CFLAGS=-O1 LDFLAGS=-pipe ./configure --prefix=/opt/rubies/baseruby --disable-rubygems --disable-install-doc --disable-install-rdoc --disable-install-capi --with-ext=monitor,digest --with-static-linked-ext --disable-jit-support --disable-shared --disable-dln; \
+  make -j "$(nproc)" miniruby;
 
 FROM scratch
 
-COPY --from=builder /opt/rubies/baseruby /opt/rubies/baseruby
+COPY --from=builder /usr/src/ruby/miniruby /miniruby
