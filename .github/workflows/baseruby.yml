@@ -21,7 +21,7 @@ jobs:
 
   build:
     needs: "set-matrix"
-    name: "Ruby ${{matrix.ruby}} on ${{ matrix.platform }}"
+    name: "Ruby ${{ matrix.ruby.slug }} on ${{ matrix.platform }}"
     runs-on: "ubuntu-latest"
     permissions:
       contents: read
