@@ -1,7 +1,6 @@
 name: "Baseruby"
 
 on:
-  - "push"
   - "workflow_dispatch"
 
 jobs:
