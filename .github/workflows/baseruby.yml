@@ -1,4 +1,4 @@
-name: "Build"
+name: "Baseruby"
 
 on:
   - "push"
@@ -10,12 +10,7 @@ concurrency:
 
 jobs:
   build:
-    name: "Build baseruby"
-    needs: "set-matrix"
     runs-on: "ubuntu-latest"
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
     steps:
       - uses: "actions/checkout@v3"
 
@@ -43,19 +38,3 @@ jobs:
             RUBY_VERSION=3.1.2
             RUBY_MINOR=3.1
             RUBY_SHA256=61843112389f02b735428b53bb64cf988ad9fb81858b8248e22e57336f24a83e
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: "Build"
-        id: "build"
-        run: |
-          cache="type=gha,scope=${{ matrix.cache-scope }},url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN"
-          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --push"
