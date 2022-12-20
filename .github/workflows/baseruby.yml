@@ -6,18 +6,24 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.platform }}
     runs-on: "ubuntu-latest"
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - "linux/amd64"
+          - "linux/arm64"
     steps:
       - uses: "actions/checkout@v3"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: linux/amd64
-          # platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -34,10 +40,5 @@ jobs:
         with:
           push: true
           context: ./docker/builds/baseruby
-          platforms: linux/amd64
-          # platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           tags: ghcr.io/oxidize-rb/baseruby:latest
-          build-args: |
-            RUBY_VERSION=3.1.2
-            RUBY_MINOR=3.1
-            RUBY_SHA256=61843112389f02b735428b53bb64cf988ad9fb81858b8248e22e57336f24a83e
