@@ -36,7 +36,7 @@ ruby:
     minor: "2.7"
     sha256: "e7203b0cc09442ed2c08936d483f8ac140ec1c72e37bb5c401646b7866cb5d10"
 
-  - version: "3.2.0-preview2"
-    slug: "3.2-preview2"
+  - version: "3.2.0-rc1"
+    slug: "3.2-rc1"
     minor: "3.2"
-    sha256: "8a78fd7a221b86032f96f25c1d852954c94d193b9d21388a9b434e160b7ed891"
+    sha256: "3bb9760c1ac1b66416aaa4899809f6ccd010e57038eaaeca19a383fd56275dac"

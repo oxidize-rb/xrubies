@@ -1,8 +1,12 @@
-FROM buildpack-deps as ruby-3.1
+FROM buildpack-deps as ruby
 
-ARG RUBY_VERSION="3.1.3"
-ARG RUBY_MINOR="3.1"
-ARG RUBY_SHA256="5ea498a35f4cd15875200a52dde42b6eb179e1264e17d78732c3a57cd1c6ab9e"
+ARG RUBY_VERSION
+ARG RUBY_MINOR
+ARG RUBY_SHA256
+
+LABEL org.oxidize-rb.ruby.version="$RUBY_VERSION" \
+      org.oxidize-rb.ruby.minor="$RUBY_MINOR" \
+      org.oxidize-rb.ruby.sha256="$RUBY_SHA256"
 
 COPY vendor-libs.sh /
 
@@ -25,12 +29,12 @@ RUN set -ex; \
     libyaml-dev \
     zlib1g-dev; \
   ./autogen.sh; \
-  LDFLAGS=-pipe ./configure --prefix=/opt/rubies/$RUBY_MINOR --disable-install-doc --disable-install-rdoc --disable-install-capi --with-static-linked-ext --disable-jit-support --disable-shared; \
+  LDFLAGS=-pipe ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --with-static-linked-ext --disable-jit-support --disable-shared; \
   make -j "$(nproc)" install; \
-  /vendor-libs.sh /opt/rubies/$RUBY_MINOR; \
+  /vendor-libs.sh /opt/rubies/baseruby; \
   apt-get --purge autoremove -y -qq patchelf libffi-dev libgdbm-dev libgmp-dev libncurses5-dev libreadline-dev libssl-dev libyaml-dev zlib1g-dev; \
-  rm -rf /usr/src/ruby /opt/rubies/$RUBY_MINOR/share /var/apt/lists/*;
+  rm -rf /usr/src/ruby /opt/rubies/baseruby/share /var/apt/lists/*;
 
 FROM scratch
 
-COPY --from=ruby-3.1 /opt/rubies/3.1  /opt/rubies/3.1
+COPY --from=ruby /opt/rubies/baseruby  /

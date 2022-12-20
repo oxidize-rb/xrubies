@@ -31,8 +31,10 @@ namespace :github do
     end
 
     desc "Simulate GitHub action build locally"
-    task :local do
-      sh "act push --container-architecture linux/amd64 --rm"
+    task :act, [:workflow] do |t, args|
+      require "rbconfig"
+      arch = RbConfig::CONFIG["host_cpu"] == "x86_64" ? "linux/amd64" : "linux/arm64"
+      sh "act push --container-architecture #{arch} --rm --workflows .github/workflows/#{args[:workflow]}.yml"
     end
   end
 end

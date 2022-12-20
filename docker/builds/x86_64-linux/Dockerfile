@@ -10,6 +10,12 @@ ARG RUBY_SHA256
 ARG RUBY_TARGET
 ARG RUST_TARGET
 
+LABEL org.oxidize-rb.ruby.version="$RUBY_VERSION" \
+      org.oxidize-rb.ruby.minor="$RUBY_MINOR" \
+      org.oxidize-rb.ruby.sha256="$RUBY_SHA256" \
+      org.oxidize-rb.ruby.platform="$RUBY_TARGET" \
+      org.oxidize-rb.rust.target="$RUST_TARGET"
+
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     DEB_ARCH="amd64"
