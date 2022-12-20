@@ -6,6 +6,7 @@ on:
 
 jobs:
   set-matrix:
+    name: "⊹"
     runs-on: "ubuntu-latest"
     outputs:
       ruby: "${{ steps.set-matrix.outputs.ruby }}"
@@ -61,6 +62,6 @@ jobs:
             ghcr.io/oxidize-rb/rubies:${{ matrix.ruby.slug }}
             ghcr.io/oxidize-rb/rubies:${{ matrix.ruby.version }}
           build-args: |
-            RUBY_VERSION="${{ matrix.ruby.version }}"
-            RUBY_MINOR="${{ matrix.ruby.minor }}"
-            RUBY_SHA256="${{ matrix.ruby.sha256 }}"
+            RUBY_VERSION=${{ matrix.ruby.version }}
+            RUBY_MINOR=${{ matrix.ruby.minor }}
+            RUBY_SHA256=${{ matrix.ruby.sha256 }}
