@@ -12,7 +12,7 @@ RUN set -ex; \
   rm ruby.tar.gz; \
   cd /usr/src/ruby; \
   ./autogen.sh; \
-  ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --with-ext= --disable-jit-support --disable-install-static-librar --disable-shared --disable-dln; \
+  ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --with-ext=monitor --disable-jit-support --disable-install-static-librar --disable-shared --disable-dln; \
   make -j "$(nproc)" install;
 
 FROM scratch
