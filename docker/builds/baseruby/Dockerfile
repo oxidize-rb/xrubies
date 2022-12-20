@@ -28,7 +28,7 @@ RUN set -ex; \
     libssl-dev \
     libyaml-dev \
     zlib1g-dev; \
-  ./autogen.sh; \
+  autoreconf; \
   LDFLAGS=-pipe ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --with-static-linked-ext --disable-jit-support --disable-shared; \
   make -j "$(nproc)" install; \
   /vendor-libs.sh /opt/rubies/baseruby; \
