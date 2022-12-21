@@ -23,7 +23,8 @@ main() {
   for lib in "${needed[@]}"; do
     if [ ! -f "$ruby_install_dir/vendor/lib/$lib" ]; then
       echo "Vendoring $lib" >&2
-      cp -v "$(ldconfig -p | grep "$lib" | cut -d ">" -f 2 | xargs)" "$ruby_install_dir/vendor/lib"
+      found="$(find /usr/lib/"$(gcc -dumpmachine)" -name "$lib")"
+      cp -v "$found" "$ruby_install_dir/vendor/lib"
     fi
   done
 
