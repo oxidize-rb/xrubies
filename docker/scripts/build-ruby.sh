@@ -123,15 +123,15 @@ vendor_libs() {
 
   for lib in ${libs_to_patch}; do
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz)'); do
-      needed+=("$dep")
+      found="$(ldd "$lib" | grep "$dep" | cut -f 3 d ' ')"
+      needed+=("$found")
     done
   done
 
   for lib in "${needed[@]}"; do
     if [ ! -f "$ruby_install_dir/vendor/lib/$lib" ]; then
       echo "Vendoring $lib" >&2
-      found="$(find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$lib" || ldconfig -p | grep "$lib" | cut -d ">" -f 2 | xargs)"
-      cp -v "$found" "$ruby_install_dir/vendor/lib"
+      cp -v "$lib" "$ruby_install_dir/vendor/lib"
     fi
   done
 
