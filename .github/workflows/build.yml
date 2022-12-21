@@ -81,7 +81,7 @@ jobs:
         run: |
           : Pushing tags
           echo "::group::Pushing base tag: $BASE_TAG"
-          docker push "$BASE_TAG"
+          docker push $BASE_TAG
           echo "::endgroup::"
           each-docker-tag.sh -- docker push %DOCKER_TAG%
           echo "docker-tags=${{ steps.build.outputs.docker-tags }}" >> $GITHUB_OUTPUT
