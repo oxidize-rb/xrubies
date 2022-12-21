@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+
+cli_options = Struct.new(:image).new
+extra_args = []
+
+begin
+  OptionParser.new do |opts|
+    opts.on("--image=IMAGE", "Run tests for given Docker image") do |i|
+      ARGV.delete("--image=#{i}")
+      ARGV.delete("--image")
+      ARGV.delete(i)
+      cli_options.image = i
+    end
+  end.parse!
+rescue OptionParser::InvalidOption => e
+  extra_args += e.args
+  retry
+end
+
+if cli_options.image
+  $stderr.puts "Running tests for #{cli_options.image}"
+  docker_command = "docker run --rm -v $(pwd):/tmp --workdir=/tmp #{cli_options.image} ruby test/autorun.rb #{(extra_args).join(" ")}"
+  $stderr.puts "Running: #{docker_command}"
+  exec(docker_command)
+else
+  require_relative "../test/autorun"
+end
+

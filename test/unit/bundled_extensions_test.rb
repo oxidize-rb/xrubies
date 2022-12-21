@@ -1,6 +1,4 @@
-require "rbconfig"
-require "minitest/autorun"
-require "minitest/spec"
+require "test_helper"
 
 describe "Precompiled Ruby" do
   it "works with bundled compiled gems (yaml)" do
@@ -17,6 +15,7 @@ describe "Precompiled Ruby" do
 
   it "works with bundled compiled gems (openssl)" do
     require "openssl"
+
   end
 
   it "works with bundled compiled gems (zlib)" do
@@ -31,5 +30,6 @@ describe "Precompiled Ruby" do
 
   it "works with bundled compiled gems (readline)" do
     require "readline"
+
   end
 end

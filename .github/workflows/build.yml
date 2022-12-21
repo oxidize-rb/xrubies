@@ -28,6 +28,8 @@ jobs:
     name: "${{ matrix.name }}"
     needs: "set-matrix"
     runs-on: "ubuntu-latest"
+    outputs:
+      docker-tags: "${{ steps.push.outputs.docker-tags }}"
     strategy:
       fail-fast: false
       matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
@@ -59,5 +61,25 @@ jobs:
       - name: "Build"
         id: "build"
         run: |
+          : Building image
           cache="type=gha,scope=${{ matrix.cache-scope }},url=$ACTIONS_CACHE_URL,token=$ACTIONS_RUNTIME_TOKEN"
-          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --push"
+          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --load"
+
+      - name: "Test"
+        run: |
+          : Testing image
+          bin/test --image "${{ steps.build.outputs.docker-tags[0] }}"
+
+      - name: "Push"
+        env:
+          TAGS: "${{ steps.build.outputs.docker-tags }}"
+        run: |
+          : Pushing tags
+          for tag in $(echo "$TAGS" | jq -r '.[]'); do
+            echo "::group::Pushing $tag"
+            docker push "$tag"
+            echo "::endgroup::"
+          done
+
+          echo "docker-tags=$TAGS" >> $GITHUB_OUTPUT
+

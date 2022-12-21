@@ -29,6 +29,4 @@ RUN set -ex; \
       --with-baseruby=/baseruby/bin/ruby \
       --disable-jit-support;
 
-COPY docker/scripts/run-tests.sh test/tests.rb /
-RUN /run-tests.sh
-
+ENV PATH="/opt/xrubies/$RUBY_MINOR/bin:$PATH"

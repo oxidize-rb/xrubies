@@ -25,6 +25,5 @@ COPY docker/scripts/build-ruby.sh /
 RUN /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --disable-jit-support;
 
-COPY docker/scripts/run-tests.sh test/tests.rb /
-RUN /run-tests.sh
+ENV PATH="/opt/xrubies/$RUBY_MINOR/bin:$PATH"
 
