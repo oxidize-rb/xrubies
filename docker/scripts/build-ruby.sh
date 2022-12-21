@@ -130,7 +130,7 @@ vendor_libs() {
   for lib in "${needed[@]}"; do
     if [ ! -f "$ruby_install_dir/vendor/lib/$lib" ]; then
       echo "Vendoring $lib" >&2
-      found="$(find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$lib")"
+      found="$(find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$lib" || ldconfig -p | grep "$lib" | cut -d ">" -f 2 | xargs)"
       cp -v "$found" "$ruby_install_dir/vendor/lib"
     fi
   done
