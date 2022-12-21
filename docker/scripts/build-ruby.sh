@@ -96,7 +96,16 @@ install_patchelf() {
   local td
   td="$(mktemp -d)"
   local cpu_type
-  cpu_type="$(uname -m)"
+
+  if [ "$DEB_ARCH" = "arm64" ]; then
+    cpu_type="aarch64"
+  elif [ "$DEB_ARCH" = "amd64" ]; then
+    cpu_type="x86_64"
+  else
+    echo "Unsupported architecture: $DEB_ARCH" >&2
+    exit 1
+  fi
+
   local url
   url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
   curl -fsSL "$url" | tar -xz -C "$td"
