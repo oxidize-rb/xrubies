@@ -58,5 +58,12 @@ This tool takes a lot of inspiration from `rake-compiler-dock`, but differs in a
 5. (Eventually) will have full support for M1 macOS builds, without emulation.
    This means Rust compilation times will be much faster on Apple Silicon.
 
+6. (Eventually) will support the ability the vendor dylibs installed used by
+   gems by using. We [already do this for `libruby`][vendor-libs] using patchelf,
+   but we can do the same for other gems. This is what
+   [`auditwheel`][auditwheel] does for python.
+
 [cross-rs]: https://github.com/cross-rs/cross
 [packages]: https://github.com/oxidize-rb/xrubies/packages
+[vendor-libs]: https://github.com/oxidize-rb/xrubies/blob/1f5402baa7982d25931183091b9515b20e90c0e7/docker/scripts/build-ruby.sh#L120
+[auditwheel]: https://github.com/pypa/auditwheel
