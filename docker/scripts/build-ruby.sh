@@ -10,7 +10,7 @@ download_ruby() {
   local ruby_minor="$2"
   local ruby_sha256="$3"
   mkdir -p src
-  curl -fsSL "https://cache.ruby-lang.org/pub/ruby/$ruby_minor/ruby-$ruby_version.tar.gz" -o ruby.tar.gz
+  curl --retry 5 -fsSL "https://cache.ruby-lang.org/pub/ruby/$ruby_minor/ruby-$ruby_version.tar.gz" -o ruby.tar.gz
   echo "$ruby_sha256 *ruby.tar.gz" | sha256sum --check --strict
   tar -xf ruby.tar.gz -C "$PWD/src" --strip-components=1
   cd src
