@@ -92,7 +92,6 @@ EOF
 }
 
 install_patchelf() {
-  echo "Installing patchelf" >&2
   local td
   td="$(mktemp -d)"
   local cpu_type
@@ -105,6 +104,8 @@ install_patchelf() {
     echo "Unsupported architecture: $DEB_ARCH" >&2
     exit 1
   fi
+
+  echo "Installing patchelf for $cpu_type" >&2
 
   local url
   url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
@@ -131,6 +132,7 @@ vendor_libs() {
   needed=()
 
   for lib in ${libs_to_patch}; do
+    echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz)'); do
       found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ')"
       needed+=("$found")
