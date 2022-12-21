@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   set-matrix:
-    name: "Set matrix"
+    name: "⊹"
     runs-on: "ubuntu-latest"
     outputs:
       matrix: "${{ steps.set-matrix.outputs.matrix }}"

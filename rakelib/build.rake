@@ -11,7 +11,7 @@ namespace(:build) do
 
   def docker_tags(platform_slug, ruby, os_tag)
     [ruby.fetch("version"), ruby.fetch("slug")].map do |ruby_version_tag|
-      "ghcr.io/oxidize-rb/xrubies__#{platform_slug}__#{ruby_version_tag}:#{os_tag}"
+      "ghcr.io/oxidize-rb/xrubies/#{platform_slug}:#{ruby_version_tag}-#{os_tag}"
     end
   end
 

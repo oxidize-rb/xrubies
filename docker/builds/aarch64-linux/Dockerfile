@@ -2,7 +2,6 @@ ARG BASE_IMAGE_TAG
 ARG RUST_TARGET
 ARG RUBY_VERSION
 
-FROM ghcr.io/oxidize-rb/rubies:$RUBY_VERSION as baseruby
 FROM ghcr.io/cross-rs/$RUST_TARGET:$BASE_IMAGE_TAG
 
 ARG RUBY_VERSION
