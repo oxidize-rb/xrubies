@@ -29,7 +29,7 @@ RUN set -ex; \
     libyaml-dev \
     zlib1g-dev; \
   autoreconf; \
-  LDFLAGS=-pipe ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --with-static-linked-ext --disable-jit-support --disable-shared; \
+  LDFLAGS=-pipe ./configure --prefix=/opt/rubies/baseruby --disable-install-doc --disable-install-rdoc --disable-install-capi --disable-jit-support --enable-shared; \
   make -j "$(nproc)" install; \
   /vendor-libs.sh /opt/rubies/baseruby; \
   apt-get --purge autoremove -y -qq patchelf libffi-dev libgdbm-dev libgmp-dev libncurses5-dev libreadline-dev libssl-dev libyaml-dev zlib1g-dev; \
