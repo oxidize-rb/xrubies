@@ -134,7 +134,7 @@ vendor_libs() {
   for lib in ${libs_to_patch}; do
     echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz)'); do
-      found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ')"
+      found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ' || find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$dep" || find /usr/lib -name "$dep")"
       needed+=("$found")
     done
   done
