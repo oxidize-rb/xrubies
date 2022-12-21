@@ -7,13 +7,13 @@ WIP to make cross-compiling native Ruby gems easier. You can find the [latest bu
 ### Just to prove it works
 
 ```
-$ docker run --rm -it ghcr.io/oxidize-rb/xrubies/aarch64-linux:3.1-ubuntu \
+$ docker run --rm -it ghcr.io/oxidize-rb/aarch64-linux:3.1-ubuntu \
   /opt/xrubies/3.1/bin/ruby -v
 ruby 3.1.2p20 (2022-04-12 revision 4491bb740a) [aarch64-linux-gnu]
 ```
 
 ```sh
-docker run --rm -it ghcr.io/oxidize-rb/xrubies/x86_64-linux:3.2-rc1-centos \
+docker run --rm -it ghcr.io/oxidize-rb/x86_64-linux:3.2-rc1-centos \
   /opt/xrubies/3.2/bin/ruby -v
 ruby 3.2.0rc1 (2022-12-06 master 81e274c990) [x86_64-linux-gnu]
 ```
@@ -21,9 +21,9 @@ ruby 3.2.0rc1 (2022-12-06 master 81e274c990) [x86_64-linux-gnu]
 ### Building a custom image
 
 ```dockerfile
-FROM ghcr.io/oxidize-rb/xrubies/arch64-linux:3.1-ubuntu as ruby-3.1
-FROM ghcr.io/oxidize-rb/xrubies/arch64-linux:3.0-ubuntu as ruby-3.0
-FROM ghcr.io/oxidize-rb/xrubies/arch64-linux:2.7-ubuntu as ruby-2.7
+FROM ghcr.io/oxidize-rb/arch64-linux:3.1-ubuntu as ruby-3.1
+FROM ghcr.io/oxidize-rb/arch64-linux:3.0-ubuntu as ruby-3.0
+FROM ghcr.io/oxidize-rb/arch64-linux:2.7-ubuntu as ruby-2.7
 
 # Copy the Ruby binaries from the build containers
 COPY --from=ruby-3.1 /opt/xrubies/3.1 /opt/xrubies/3.1
