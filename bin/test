@@ -11,6 +11,7 @@ begin
       ARGV.delete("--image=#{i}")
       ARGV.delete("--image")
       ARGV.delete(i)
+      abort "Invalid image for testing: #{i}" unless i.start_with?("ghcr.io/oxidize-rb/xrubies__")
       cli_options.image = i
     end
   end.parse!

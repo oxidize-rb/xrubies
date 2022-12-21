@@ -40,6 +40,10 @@ jobs:
         with:
           ruby-version: "3.1"
 
+      - name: Setup utils
+        run: |
+          echo "$PWD/.github/workflows/bin" >> $GITHUB_PATH
+
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
 
@@ -66,20 +70,15 @@ jobs:
           rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --load"
 
       - name: "Test"
-        run: |
-          : Testing image
-          bin/test --image "${{ steps.build.outputs.docker-tags[0] }}"
+        env:
+          DOCKER_TAGS: "${{ steps.build.outputs.docker-tags }}"
+        run: each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
 
       - name: "Push"
         env:
-          TAGS: "${{ steps.build.outputs.docker-tags }}"
+          DOCKER_TAGS: "${{ steps.build.outputs.docker-tags }}"
         run: |
           : Pushing tags
-          for tag in $(echo "$TAGS" | jq -r '.[]'); do
-            echo "::group::Pushing $tag"
-            docker push "$tag"
-            echo "::endgroup::"
-          done
-
+          each-docker-tag.sh -- docker push %DOCKER_TAG%
           echo "docker-tags=$TAGS" >> $GITHUB_OUTPUT
 
