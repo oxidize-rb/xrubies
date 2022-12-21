@@ -2,7 +2,7 @@ ARG BASE_IMAGE_TAG
 ARG RUST_TARGET
 ARG RUBY_VERSION
 
-FROM ghcr.io/cross-rs/$RUST_TARGET:$BASE_IMAGE_TAG
+FROM ghcr.io/cross-rs/$RUST_TARGET:$BASE_IMAGE_TAG as base
 
 ARG RUBY_VERSION
 ARG RUBY_MINOR
@@ -22,9 +22,15 @@ ENV RUBY_TARGET="$RUBY_TARGET" \
     RUBY_SHIM_RUNNER="$CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUNNER" \
     DEB_ARCH="arm64"
 
+FROM base as builder
+
 COPY docker/scripts/build-ruby.sh /
 RUN set -ex; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --disable-jit-support;
+
+FROM base
+
+COPY --from=builder /opt/xrubies /opt/xrubies
 
 ENV PATH="/opt/xrubies/$RUBY_MINOR/bin:$PATH"

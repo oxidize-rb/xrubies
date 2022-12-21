@@ -21,27 +21,33 @@ namespace(:build) do
     ruby_platform.fetch("images").each do |image|
       RUBIES.each do |ruby|
         ruby_platform_slug = ruby_platform.fetch("slug")
-        image_slug = image.fetch("slug")
-
-        tags = docker_tags(ruby_platform_slug, ruby, image_slug)
-        tags_arg = tags.map { |t| "-t #{t}" }.join(" ")
+        os_tag = image.fetch("slug")
 
         desc("Build #{ruby["version"]} for #{ruby_platform_slug} (#{image["slug"]})")
         task([ruby_platform.fetch("slug"), image.fetch("slug"), ruby.fetch("slug")].join(":")) do
-          sh(
+          generate_command = proc do |extra_args = ""|
             <<~CMD
               #{DOCKER_BUILD} \
                 --platform=#{image.fetch("docker-platforms").join(",")} \
                 #{ruby_build_args(ruby)} \
                 #{platform_build_args(ruby_platform)} \
-                #{tags_arg} \
                 --build-arg BASE_IMAGE_TAG=#{image.fetch("tag")} \
                 -f #{ruby_platform["dir"]}/Dockerfile \
+                #{extra_args} \
                 .
             CMD
-          )
+          end
 
-          GHA.set_output("docker-tags", tags.to_json)
+          base_tag = "ghcr.io/oxidize-rb/xrubies/#{ruby_platform_slug}:base-#{os_tag}"
+          sh generate_command.call("--tag #{base_tag} --target base")
+
+          ruby_tags = docker_tags(ruby_platform_slug, ruby, os_tag)
+          ruby_tags_arg = ruby_tags.map { |t| "-t #{t}" }.join(" ")
+          sh generate_command.call(ruby_tags_arg)
+
+          docker_tags = { "base" => base_tag, "ruby" => ruby_tags }
+
+          GHA.set_output("docker-tags", docker_tags.to_json)
         end
       end
     end

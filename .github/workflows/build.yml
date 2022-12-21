@@ -71,14 +71,14 @@ jobs:
 
       - name: "Test"
         env:
-          DOCKER_TAGS: "${{ steps.build.outputs.docker-tags }}"
+          DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
         run: each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
 
       - name: "Push"
         env:
-          DOCKER_TAGS: "${{ steps.build.outputs.docker-tags }}"
+          DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
         run: |
           : Pushing tags
           each-docker-tag.sh -- docker push %DOCKER_TAG%
-          echo "docker-tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "docker-tags=${{ steps.build.outputs.docker-tags }}" >> $GITHUB_OUTPUT
 
