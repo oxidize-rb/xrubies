@@ -77,7 +77,7 @@ jobs:
       - name: "Push"
         env:
           DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
-          BASE_TAG: "${{ toJson(fromJson(steps.build.outputs.docker-tags).base) }}"
+          BASE_TAG: ${{ toJson(fromJson(steps.build.outputs.docker-tags).base) }}
         run: |
           : Pushing tags
           echo "::group::Pushing base tag: $BASE_TAG"
