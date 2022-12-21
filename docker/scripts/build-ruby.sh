@@ -123,7 +123,7 @@ vendor_libs() {
 
   for lib in ${libs_to_patch}; do
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz)'); do
-      found="$(ldd "$lib" | grep "$dep" | cut -f 3 d ' ')"
+      found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ')"
       needed+=("$found")
     done
   done
