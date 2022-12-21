@@ -84,7 +84,7 @@ install_shim() {
 # This is an auto-generated shim for the ruby executable allows Ruby to be run
 # in a on various CPU architectures.
 
-exec $CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER $ruby_install_dir/bin/__realruby "\$@"
+exec $RUBY_SHIM_RUNNER $ruby_install_dir/bin/__realruby "\$@"
 EOF
 
   chmod +x "$ruby_install_dir"/bin/ruby
