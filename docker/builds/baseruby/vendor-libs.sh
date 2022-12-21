@@ -33,6 +33,8 @@ main() {
     patchelf --set-rpath "\$ORIGIN/$relative_path_to_vendor_lib:$(patchelf --print-rpath "$lib")" "$lib";
   done;
 
+  patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_install_dir/bin/ruby";
+
   rm "${0}"
 }
 

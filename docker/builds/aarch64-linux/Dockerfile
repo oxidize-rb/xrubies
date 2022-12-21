@@ -25,7 +25,8 @@ ENV RUBY_TARGET="$RUBY_TARGET" \
 COPY --from=baseruby / /baseruby
 
 COPY docker/scripts/build-ruby.sh /
-RUN /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+RUN set -ex; \
+    /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-baseruby=/baseruby/bin/ruby \
       --disable-jit-support; \
     rm -rf /baseruby;

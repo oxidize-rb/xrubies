@@ -56,6 +56,7 @@ configure() {
       ./configure \
         --prefix="$ruby_install_dir" \
         --target="$RUBY_TARGET" \
+        --build="$MACHTYPE" \
         --host="$MACHTYPE" \
         --disable-install-doc \
         --enable-shared \
@@ -138,6 +139,8 @@ vendor_libs() {
     relative_path_to_vendor_lib="$(realpath --relative-to="$(dirname "$lib")" "$ruby_install_dir"/vendor/lib)"
     patchelf --set-rpath "\$ORIGIN/$relative_path_to_vendor_lib:$(patchelf --print-rpath "$lib")" "$lib";
   done;
+
+  patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_install_dir/bin/ruby";
 
   rm /usr/local/bin/patchelf
 }
