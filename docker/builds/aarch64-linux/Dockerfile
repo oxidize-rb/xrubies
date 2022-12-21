@@ -22,14 +22,11 @@ ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     DEB_ARCH="arm64"
 
-COPY --from=baseruby / /baseruby
-
 COPY docker/scripts/build-ruby.sh /
 RUN set -ex; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-baseruby=/baseruby/bin/ruby \
-      --disable-jit-support; \
-    rm -rf /baseruby;
+      --disable-jit-support;
 
 COPY docker/scripts/run-tests.sh test/tests.rb /
 RUN /run-tests.sh
