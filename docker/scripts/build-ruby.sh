@@ -56,8 +56,8 @@ configure() {
       ./configure \
         --prefix="$ruby_install_dir" \
         --target="$RUBY_TARGET" \
-        --build="$MACHTYPE" \
-        --host="$MACHTYPE" \
+        --build="$RUBY_TARGET" \
+        --host="$RUBY_TARGET" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
