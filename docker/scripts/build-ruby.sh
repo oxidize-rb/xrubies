@@ -161,6 +161,25 @@ vendor_libs() {
 
   patchelf --set-rpath "\$ORIGIN/../lib:\$ORIGIN/../vendor/lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_main";
 
+}
+
+shrink_rpaths() {
+  local ruby_install_dir
+  local ruby_main
+  local dylibs
+  local libs_to_patch
+
+  echo "Shrinking rpaths" >&2
+
+  ruby_install_dir="$1"
+  ruby_main="$ruby_install_dir/bin/ruby"
+  dylibs="$(find "$ruby_install_dir" -name '*.so')"
+  libs_to_patch="$ruby_main $dylibs"
+
+  for libpath in $libs_to_patch; do
+    patchelf --shrink-rpath "$(readlink -f "$libpath")"
+  done
+
   echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
   echo "Listing contents of vendor/lib" >&2
@@ -196,6 +215,7 @@ main() {
   cd /
   install_shim "$ruby_install_dir"
   purge_packages
+  shrink_rpaths "$ruby_install_dir"
 
   rm -rf "$build_dir" "${0}"
 }
