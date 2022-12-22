@@ -45,7 +45,7 @@ namespace(:build) do
                 #{platform_build_args(ruby_platform)} \
                 #{docker_extra_labels_from_environment} \
                 --build-arg BASE_IMAGE_TAG=#{image.fetch("tag")} \
-                -f #{File.join(ruby_platform["dir"]}, "Dockerfile")} \
+                -f #{File.join(ruby_platform["dir"], "Dockerfile")} \
                 #{extra_args} \
                 .
             CMD
