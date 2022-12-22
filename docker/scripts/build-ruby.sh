@@ -119,14 +119,13 @@ install_patchelf() {
 }
 
 vendor_libs() {
-  set -x
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
   install_patchelf
 
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
-  libs_to_patch="$(find "$ruby_install_dir" -type f -name '*.so')"
+  libs_to_patch="$(find "$ruby_install_dir" -name '*.so')"
 
   mkdir -p "$ruby_install_dir/vendor/lib"
 
