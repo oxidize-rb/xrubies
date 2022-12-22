@@ -119,6 +119,7 @@ install_patchelf() {
 }
 
 vendor_libs() {
+  set -x
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
   install_patchelf
@@ -144,7 +145,8 @@ vendor_libs() {
     basename="$(basename "$lib")"
     if [ ! -f "$ruby_install_dir/vendor/lib/$basename" ]; then
       echo "Vendoring $basename" >&2
-      cp -v "$lib" "$ruby_install_dir/vendor/lib"
+      # Copy, but actually write the file to disk aka no symlinks
+      cp -Lv "$lib" "$ruby_install_dir/vendor/lib"
     fi
   done
 
