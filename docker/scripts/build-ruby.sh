@@ -58,7 +58,7 @@ configure() {
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
-        --with-opt-dir="$ruby_install_dir/vendor/lib:/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
+        --with-opt-dir="$ruby_install_dir/vendor:/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
@@ -126,7 +126,9 @@ vendor_libs() {
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
   ruby_libs="$(find "$ruby_install_dir" -type f -name '*.so')"
-  libs_to_patch="$ruby_main $ruby_libs"
+  libruby_base="$(find "$ruby_install_dir" -type f -name 'libruby.so')"
+  libruby="$(readlink -f "$libruby_base")"
+  libs_to_patch="$ruby_main $ruby_libs $libruby"
 
   mkdir -p "$ruby_install_dir/vendor/lib"
 
@@ -164,7 +166,6 @@ vendor_libs() {
 
   echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
-  echo "Final rpath of vendored libs: $(patchelf --print-rpath "$ruby_install_dir/vendor/lib/libffi.so.8")" >&2
   echo "Listing contents of vendor/lib" >&2
   ls -l "$ruby_install_dir/vendor/lib" >&2
 
