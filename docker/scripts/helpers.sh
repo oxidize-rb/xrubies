@@ -3,6 +3,8 @@
 # shellcheck disable=SC2294
 # shellcheck disable=SC1091
 
+source /lib.sh
+
 purge_list=()
 
 install_packages() {
