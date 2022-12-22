@@ -49,7 +49,7 @@ configure() {
   local ruby_cc
   local archdir
 
-  ruby_cc="${CROSS_TOOLCHAIN_REFIX}gcc"
+  ruby_cc="${CROSS_TOOLCHAIN_PREFIX}gcc"
   archdir="$($ruby_cc -dumpmachine)"
 
   env
