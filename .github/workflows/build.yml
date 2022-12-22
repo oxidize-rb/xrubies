@@ -77,7 +77,7 @@ jobs:
         run: |
           : Testing image
           echo "::info::Disabling binfmt_misc for testing"
-          docker run --privileged --rm tonistiigi/binfmt --uninstall all
+          docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*
           each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
 
       - name: "Push"
