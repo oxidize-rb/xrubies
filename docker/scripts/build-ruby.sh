@@ -153,7 +153,7 @@ shrink_rpaths() {
   echo "Shrinking rpaths" >&2
 
   ruby_install_dir="$1"
-  ruby_main="$ruby_install_dir/bin/ruby"
+  ruby_main="$ruby_install_dir/bin/__realruby"
   dylibs="$(find "$ruby_install_dir" -name '*.so')"
 
   for lib in $dylibs; do
