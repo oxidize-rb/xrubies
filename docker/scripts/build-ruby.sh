@@ -58,13 +58,13 @@ configure() {
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
-        --with-opt-dir="$ruby_install_dir/vendor:/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
+        --with-opt-dir="/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
         "$@" \
       || (cat config.log && false)
-}
+}w
 
 
 install() {
@@ -95,16 +95,8 @@ EOF
 install_patchelf() {
   local td
   td="$(mktemp -d)"
-  local cpu_type
+  local cpu_type="$(uname -m)"
 
-  if [ "$DEB_ARCH" = "arm64" ]; then
-    cpu_type="aarch64"
-  elif [ "$DEB_ARCH" = "amd64" ]; then
-    cpu_type="x86_64"
-  else
-    echo "Unsupported architecture: $DEB_ARCH" >&2
-    exit 1
-  fi
 
   echo "Installing patchelf for $cpu_type" >&2
 

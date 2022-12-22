@@ -54,6 +54,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # We use qemu so Ruby can be built without a baseruby, we make sure to
+      # uninstall it before testing so we can assert things work without it.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
@@ -72,7 +74,11 @@ jobs:
       - name: "Test"
         env:
           DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
-        run: each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
+        run: |
+          : Testing image
+          echo "::info::Disabling binfmt_misc for testing"
+          docker run --privileged --rm tonistiigi/binfmt --uninstall all
+          each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
 
       - name: "Push"
         env:

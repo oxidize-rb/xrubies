@@ -45,7 +45,7 @@ namespace(:build) do
           ruby_tags_arg = ruby_tags.map { |t| "-t #{t}" }.join(" ")
           sh generate_command.call(ruby_tags_arg)
 
-          docker_tags = { "base" => base_tag, "ruby" => ruby_tags }
+          docker_tags = { "base" => base_tag, "ruby" => ruby_tags, "main" => ruby_tags.first }
 
           GHA.set_output("docker-tags", docker_tags.to_json)
         end
