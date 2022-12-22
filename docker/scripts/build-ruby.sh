@@ -125,16 +125,14 @@ vendor_libs() {
 
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
-  ruby_libs="$(find "$ruby_install_dir" -type f -name '*.so')"
-  libruby_base="$(find "$ruby_install_dir" -type f -name 'libruby.so')"
-  libruby="$(readlink -f "$libruby_base")"
-  libs_to_patch="$ruby_main $ruby_libs $libruby"
+  libs_to_patch="$(find "$ruby_install_dir" -type f -name '*.so')"
 
   mkdir -p "$ruby_install_dir/vendor/lib"
 
   needed=()
 
-  for lib in ${libs_to_patch}; do
+  for lib_or_libsymlink in "${libs_to_patch[@]}"; do
+    lib="$(readlink -f "$lib_or_libsymlink")"
     echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
       found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ' || find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$dep" || find /usr/lib -name "$dep")"
@@ -162,7 +160,7 @@ vendor_libs() {
     patchelf --set-rpath "\$ORIGIN:$(patchelf --print-rpath "$lib")" "$lib"
   done
 
-  patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_install_dir/bin/ruby";
+  patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_main";
 
   echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
