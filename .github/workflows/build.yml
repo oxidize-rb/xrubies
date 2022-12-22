@@ -24,7 +24,7 @@ jobs:
       - id: "set-matrix"
         run: rake github:actions:matrix
 
-  build:
+  build-rubies:
     name: "${{ matrix.name }}"
     needs: "set-matrix"
     runs-on: "ubuntu-latest"
@@ -64,8 +64,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Docker meta
+        uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: ${{ matrix.repo }}
+          tags: type=sha
+
       - name: "Build"
         id: "build"
+        env:
+          DOCKER_EXTRA_LABELS_JSON: ${{ toJson(fromJSON(steps.meta.outputs.json).labels) }}
         run: |
           : Building image
           cache="type=gha,scope=$GITHUB_REF_NAME-${{ matrix.cache-scope }}"
