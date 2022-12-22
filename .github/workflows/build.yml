@@ -72,12 +72,15 @@ jobs:
 
       - name: Format args
         id: format
+        env:
+          LABELS: ${{ toJson(matrix.docker.labels) }}
+          BUILD_ARGS: ${{ toJson(matrix.docker.build_args) }}
         run: |
           : Format args
           # Turn labels hash into key=value pairs
-          labels=$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "${{ toJson(matrix.docker.labels) }}")
+          labels="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$LABELS")"
           echo "labels=$labels" >> $GITHUB_OUTPUT
-          build_args=$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "${{ toJson(matrix.docker.build_args) }}")
+          build_args="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$BUILD_ARGS")")"
           echo "build-args=$build_args" >> $GITHUB_OUTPUT
 
       - name: Build and push
