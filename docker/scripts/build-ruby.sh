@@ -132,7 +132,7 @@ vendor_libs() {
 
   needed=()
 
-  for lib_or_libsymlink in "${libs_to_patch[@]}"; do
+  for lib_or_libsymlink in ${libs_to_patch}; do
     lib="$(readlink -f "$lib_or_libsymlink")"
     echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
