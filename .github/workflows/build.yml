@@ -8,6 +8,10 @@ concurrency:
   group: "build-${{ github.ref }}"
   cancel-in-progress: true
 
+permissions:
+  contents: "read"
+  packages: "write"
+
 jobs:
   set-matrix:
     name: "⊹"
@@ -25,11 +29,9 @@ jobs:
         run: rake github:actions:matrix
 
   build-rubies:
-    name: "${{ matrix.name }}"
+    name: "${{ matrix.short-slug }}"
     needs: "set-matrix"
     runs-on: "ubuntu-latest"
-    outputs:
-      docker-tags: "${{ steps.push.outputs.docker-tags }}"
     strategy:
       fail-fast: false
       matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
@@ -44,9 +46,6 @@ jobs:
         run: |
           echo "$PWD/.github/workflows/bin" >> $GITHUB_PATH
 
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v2
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -59,7 +58,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: ${{ matrix.platform }}
+          platforms: ${{ join(matrix.docker.platforms, ',') }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -68,36 +67,39 @@ jobs:
         uses: docker/metadata-action@v4
         id: meta
         with:
-          images: ${{ matrix.repo }}
+          images: ${{ matrix.docker.repo }}
           tags: type=sha
 
-      - name: "Build"
-        id: "build"
-        env:
-          DOCKER_EXTRA_LABELS_JSON: ${{ toJson(fromJSON(steps.meta.outputs.json).labels) }}
+      - name: Format args
+        id: format
         run: |
-          : Building image
-          cache="type=gha,scope=$GITHUB_REF_NAME-${{ matrix.cache-scope }}"
-          rake "${{ matrix.rake-task }}" DOCKER_BUILD="docker buildx build --cache-to $cache --cache-from $cache,mode=max --load"
+          : Format args
+          # Turn labels hash into key=value pairs
+          labels=$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "${{ toJson(matrix.docker.labels) }}")
+          echo "labels=$labels" >> $GITHUB_OUTPUT
+          build_args=$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "${{ toJson(matrix.docker.build_args) }}")
+          echo "build-args=$build_args" >> $GITHUB_OUTPUT
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          file: ${{ matrix.docker.file }}
+          platforms: ${{ join(matrix.docker.platforms, ',') }}
+          build-args: |
+            ${{ join(steps.format.outputs.build-args, '\n') }}
+          tags: |
+            ${{ join(matrix.docker.tags, '\n') }}
+          labels: |
+            ${{ join(steps.format.outputs.labels, '\n') }}
+            ${{ steps.meta.outputs.labels }}
 
       - name: "Test"
         env:
-          DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
+          DOCKER_TAGS: "${{ toJson(matrix.docker.tags) }}"
         run: |
           : Testing image
           echo "::info::Disabling binfmt_misc for testing"
           docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*
           each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
-
-      - name: "Push"
-        env:
-          DOCKER_TAGS: "${{ toJson(fromJson(steps.build.outputs.docker-tags).ruby) }}"
-          BASE_TAG: "${{ fromJson(steps.build.outputs.docker-tags).base }}"
-        run: |
-          : Pushing tags
-          echo "::group::Pushing base tag: $BASE_TAG"
-          docker push $BASE_TAG
-          echo "::endgroup::"
-          each-docker-tag.sh -- docker push %DOCKER_TAG%
-          echo "docker-tags=${{ steps.build.outputs.docker-tags }}" >> $GITHUB_OUTPUT
-

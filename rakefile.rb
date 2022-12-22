@@ -1,8 +1,8 @@
-require "yaml"
+$LOAD_PATH.unshift(File.expand_path("lib", __dir__))
 
-MATRIX = YAML.load_file("matrix.yml")
-RUBY_PLATFORMS = MATRIX.fetch("ruby-platform")
-RUBIES = MATRIX.fetch("ruby")
+require "yaml"
+require "xrubies/matrix"
+
 DOCKER_BUILD = ENV.fetch("DOCKER_BUILD", "docker buildx build --load --progress=plain")
 
 task(:fmt) do

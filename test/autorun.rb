@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
 $LOAD_PATH.unshift(__dir__)
 test_dir = File.expand_path("../../test", __FILE__)
 require File.join(test_dir, "test_helper")

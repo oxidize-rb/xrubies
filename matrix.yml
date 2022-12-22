@@ -20,7 +20,7 @@ ruby-platform:
       # - slug: "centos"
       #   tag: "edge-centos"
       #   docker-platforms: ["linux/amd64"]
-ruby:
+ruby-version:
   - version: "3.1.2"
     slug: "3.1"
     minor: "3.1"
