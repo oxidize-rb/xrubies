@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # shellcheck disable=SC1091
-source /lib.sh
+source /helpers.sh
 
 download_ruby() {
   local ruby_version="$1"
@@ -27,17 +27,17 @@ install_deps() {
     gdbm-devel \
     ncurses-devel
 
-  if_ubuntu dpkg --add-architecture "$DEB_ARCH"
+  if_ubuntu dpkg --add-architecture "$TARGET_DEB_ARCH"
 
   if_ubuntu install_packages \
-    zlib1g-dev:"$DEB_ARCH" \
-    libreadline-dev:"$DEB_ARCH" \
-    libsqlite0-dev:"$DEB_ARCH" \
-    libssl-dev:"$DEB_ARCH" \
-    libyaml-dev:"$DEB_ARCH" \
-    libffi-dev:"$DEB_ARCH" \
-    libgdbm-dev:"$DEB_ARCH" \
-    libncurses5-dev:"$DEB_ARCH"
+    zlib1g-dev:"$TARGET_DEB_ARCH" \
+    libreadline-dev:"$TARGET_DEB_ARCH" \
+    libsqlite0-dev:"$TARGET_DEB_ARCH" \
+    libssl-dev:"$TARGET_DEB_ARCH" \
+    libyaml-dev:"$TARGET_DEB_ARCH" \
+    libffi-dev:"$TARGET_DEB_ARCH" \
+    libgdbm-dev:"$TARGET_DEB_ARCH" \
+    libncurses5-dev:"$TARGET_DEB_ARCH"
 }
 
 configure() {
@@ -95,25 +95,6 @@ EOF
 
   chmod +x "$ruby_install_dir"/bin/ruby
   "$ruby_install_dir"/bin/ruby -v
-}
-
-install_patchelf() {
-  local td
-  td="$(mktemp -d)"
-  local cpu_type
-  cpu_type="$(uname -m)"
-
-
-  echo "Installing patchelf for $cpu_type" >&2
-
-  local url
-  url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
-  curl -fsSL "$url" | tar -xz -C "$td"
-
-
-  mv "$td/bin/patchelf" /usr/local/bin
-  rm -rf "$td"
-  echo "Installed patchelf: $(patchelf --version)" >&2
 }
 
 vendor_libs() {

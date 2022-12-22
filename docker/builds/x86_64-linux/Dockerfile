@@ -19,7 +19,9 @@ LABEL org.oxidize-rb.ruby.version="$RUBY_VERSION" \
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER" \
-    DEB_ARCH="amd64"
+    TARGET_DEB_ARCH="amd64"
+
+COPY docker/scripts/helpers.sh /
 
 FROM base as builder
 
