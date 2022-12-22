@@ -146,11 +146,18 @@ vendor_libs() {
     fi
   done
 
-  echo "Patch the rpath of the ruby binary and all the gem libraries" >&2
+  echo "Patching rpath bundled gem dylibs" >&2
   for lib in $libs_to_patch; do
     relative_path_to_vendor_lib="$(realpath --relative-to="$(dirname "$lib")" "$ruby_install_dir"/vendor/lib)"
-    patchelf --set-rpath "\$ORIGIN/$relative_path_to_vendor_lib:$(patchelf --print-rpath "$lib")" "$lib";
-  done;
+    patchelf --set-rpath "\$ORIGIN/$relative_path_to_vendor_lib:$(patchelf --print-rpath "$lib")" "$lib"
+  done
+
+  echo "Patching rpath of all vendored libs" >&2
+  for lib in "$ruby_install_dir"/vendor/lib/*; do
+    echo "Patching $lib" >&2
+    patchelf --set-rpath "\$ORIGIN:$(patchelf --print-rpath "$lib")" "$lib"
+  done
+
 
   patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_install_dir/bin/ruby";
 
