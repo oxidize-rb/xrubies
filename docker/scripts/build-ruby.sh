@@ -159,7 +159,7 @@ vendor_libs() {
     patchelf --set-rpath "\$ORIGIN:$(patchelf --print-rpath "$lib")" "$lib"
   done
 
-  patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_main";
+  patchelf --set-rpath "\$ORIGIN/../lib:\$ORIGIN/../vendor/lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_main";
 
   echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
