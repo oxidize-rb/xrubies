@@ -46,9 +46,14 @@ configure() {
   shift
 
   autoreconf
+  local ruby_cc
+  local archdir
+
+  ruby_cc="${CROSS_TOOLCHAIN_REFIX}gcc"
+  archdir="$($ruby_cc -dumpmachine)"
 
   env
-    CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
+    CC="$ruby_cc" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
     CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong" \
@@ -58,13 +63,13 @@ configure() {
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
-        --with-opt-dir="/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
+        --with-opt-dir="/usr/lib/$archdir" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
         "$@" \
       || (cat config.log && false)
-}w
+}
 
 
 install() {
@@ -95,7 +100,8 @@ EOF
 install_patchelf() {
   local td
   td="$(mktemp -d)"
-  local cpu_type="$(uname -m)"
+  local cpu_type
+  cpu_type="$(uname -m)"
 
 
   echo "Installing patchelf for $cpu_type" >&2
