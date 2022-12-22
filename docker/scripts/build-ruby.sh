@@ -155,13 +155,16 @@ shrink_rpaths() {
   ruby_install_dir="$1"
   ruby_main="$ruby_install_dir/bin/ruby"
   dylibs="$(find "$ruby_install_dir" -name '*.so')"
-  libs_to_patch="$ruby_main $dylibs"
 
-  for libpath in $libs_to_patch; do
-    patchelf --shrink-rpath "$(readlink -f "$libpath")"
+  for lib in $dylibs; do
+    echo "Shrinking rpath of $lib" >&2
+    patchelf --shrink-rpath "$lib"
   done
 
-  echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
+  echo "Shrinking rpath of $ruby_install_dir/bin/ruby" >&2
+  patchelf --shrink-rpath "$ruby_main"
+
+  echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_main")" >&2
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
   echo "Listing contents of vendor/lib" >&2
   ls -l "$ruby_install_dir/vendor/lib" >&2
