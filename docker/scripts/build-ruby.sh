@@ -58,6 +58,7 @@ configure() {
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
+        --with-opt-dir="$ruby_install_dir/vendor/lib:/usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
@@ -68,7 +69,7 @@ configure() {
 
 install() {
   echo "Installing ruby" >&2
-  make V=1 -j "$(nproc)" install
+  make -j "$(nproc)" install
 }
 
 install_shim() {
@@ -140,8 +141,9 @@ vendor_libs() {
   done
 
   for lib in "${needed[@]}"; do
-    if [ ! -f "$ruby_install_dir/vendor/lib/$lib" ]; then
-      echo "Vendoring $lib" >&2
+    basename="$(basename "$lib")"
+    if [ ! -f "$ruby_install_dir/vendor/lib/$basename" ]; then
+      echo "Vendoring $basename" >&2
       cp -v "$lib" "$ruby_install_dir/vendor/lib"
     fi
   done
@@ -158,8 +160,13 @@ vendor_libs() {
     patchelf --set-rpath "\$ORIGIN:$(patchelf --print-rpath "$lib")" "$lib"
   done
 
-
   patchelf --set-rpath "\$ORIGIN/../lib:$(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" "$ruby_install_dir/bin/ruby";
+
+  echo "Final rpath of ruby bin: $(patchelf --print-rpath "$ruby_install_dir/bin/ruby")" >&2
+  echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
+  echo "Final rpath of vendored libs: $(patchelf --print-rpath "$ruby_install_dir/vendor/lib/libffi.so.8")" >&2
+  echo "Listing contents of vendor/lib" >&2
+  ls -l "$ruby_install_dir/vendor/lib" >&2
 
   rm /usr/local/bin/patchelf
 }

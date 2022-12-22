@@ -23,7 +23,8 @@ namespace(:github) do
     desc("Generate GitHub Actions matrix")
     task(:matrix) do
       matrix = Rake::Task.tasks.select { |t| t.name.start_with?("build:") }.map do |t|
-        {"name" => t.name, "rake-task" => t.name, "cache-scope" => t.name.gsub(":", "__")}
+        cache_scope = t.name.gsub(/[^a-zA-Z0-9_]/, "-")
+        {"name" => t.name, "rake-task" => t.name, "cache-scope" => cache_scope}
       end
 
       GHA.set_output(:matrix, JSON.dump(include: matrix))
