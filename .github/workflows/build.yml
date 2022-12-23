@@ -38,13 +38,6 @@ jobs:
     steps:
       - uses: "actions/checkout@v3"
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       # We use qemu so Ruby can be built without a baseruby, we make sure to
       # uninstall it before testing so we can assert things work without it.
       - name: Set up QEMU
@@ -68,14 +61,22 @@ jobs:
             const arr = (val) => val.join("\n");
             const obj = (val) => arr(Object.entries(val).map(([k, v]) => `${k}=${v}`));
 
+            console.log(Object.keys(context.workflow));
+
+            const tags = ${{ toJson(matrix.docker.tags) }};
+            const cacheScope = `${process.env.GITHUB_REF_NAME}-${tags[0]}`;
+
             core.setOutput('args', {
               'context': '.',
-              'push': true,
+              'push': false,
+              'load': true,
               'file': "${{ matrix.docker.file }}",
               'platforms': ${{ toJson(matrix.docker.platforms) }}.join(','),
               'build-args': obj(${{ toJson(matrix.docker.build-args) }}),
-              'tags': arr(${{ toJson(matrix.docker.tags) }}),
+              'tags': arr(tags),
               'labels': obj(${{ toJson(matrix.docker.labels) }}) + "\n" + ${{ toJson(steps.meta.outputs.labels) }},
+              'cache-from': "type=gha,scope=${cacheScope}",
+              'cache-to': "type=gha,mode=max,scope=${cacheScope}"
             });
 
       - name: Build and push
@@ -89,15 +90,32 @@ jobs:
             core.info('::info::Disabling binfmt_misc for testing');
             await exec.exec('docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*');
 
-            console.log(Object.keys(context));
+            console.log(Object.keys(context.workflow));
 
             const tags = ${{ toJson(matrix.docker.tags) }};
 
             for (const tag of tags) {
-              core.info(`::group::Testing image ${tag}`);
+              core.info(`Testing image ${tag}`);
               const exitCode = await exec.exec(`bin/test --image ${tag}`);
 
               if (exitCode !== 0) {
                 core.setFailed(`${tag} did not pass tests`);
               }
             }
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to GitHub Container Registry
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tags = ${{ toJson(matrix.docker.tags) }};
+
+            await Promise.all(tags.map((tag) => {
+              return core.group(`Pushing ${tag}`, () => exec.exec(`docker push ${tag}`));
+            }));
