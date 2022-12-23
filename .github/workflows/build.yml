@@ -49,8 +49,6 @@ jobs:
       # uninstall it before testing so we can assert things work without it.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-        with:
-          platforms: ${{ join(matrix.docker.platforms, ',') }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
