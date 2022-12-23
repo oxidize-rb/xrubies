@@ -2,6 +2,27 @@
 
 set -euo pipefail
 
+main() {
+  case "$1" in
+    openssl_1_1)
+      shift
+      build_openssl_1_1 "$@"
+      ;;
+    zlib)
+      shift
+      build_zlib "$@"
+      ;;
+    yaml)
+      shift
+      build_yaml "$@"
+      ;;
+    *)
+      echo "Unknown package $1" >&2
+      exit 1
+      ;;
+  esac
+}
+
 enter_build_dir() {
     local dir
     dir="$(mktemp -d)"
@@ -49,20 +70,41 @@ build_openssl_1_1() {
   make install_sw
   popd
   echo "Built openssl 1.1 to $install_dir" >&2
-  echo "$install_dir"
 }
 
-main() {
-  case "$1" in
-    openssl_1_1)
-      shift
-      build_openssl_1_1 "$@"
-      ;;
-    *)
-      echo "Unknown package $1" >&2
-      exit 1
-      ;;
-  esac
+build_zlib() {
+  local url="https://zlib.net/zlib-1.2.13.tar.gz"
+  local sha256="b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
+  local file="zlib-1.2.13.tar.gz"
+  local install_dir="/tmp/pkg"
+
+  enter_build_dir
+  download_source "$url" "$file" "$sha256"
+  tar -xf "$file" --strip-components=1
+
+  with_build_env ./configure --prefix="$install_dir" "$@"
+
+  make
+  make install
+  popd
+  echo "Built libz to $install_dir" >&2
+}
+
+build_yaml() {
+  local url="https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
+  local sha256="c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4"
+  local file="yaml-0.2.5.tar.gz"
+
+  local install_dir="/tmp/pkg"
+  enter_build_dir
+  download_source "$url" "$file" "$sha256"
+  tar -xf "$file" --strip-components=1
+
+  with_build_env ./configure --prefix="$install_dir" "$@"
+  make
+  make install
+  popd
+  echo "Built libyaml to $install_dir" >&2
 }
 
 main "$@"

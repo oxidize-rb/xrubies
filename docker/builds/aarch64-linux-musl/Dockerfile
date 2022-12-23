@@ -25,6 +25,8 @@ COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
     /build-packages.sh openssl_1_1 linux-aarch64; \
+    /build-packages.sh zlib; \
+    /build-packages.sh yaml; \
     rm /build-packages.sh;
 
 RUN set -ex; \
