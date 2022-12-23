@@ -28,7 +28,7 @@ RUN set -ex; \
     rm /build-packages.sh;
 
 RUN set -ex; \
-    build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+    /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --disable-jit-support;
 
 FROM base
