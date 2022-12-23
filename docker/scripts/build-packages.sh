@@ -47,6 +47,7 @@ download_source() {
 }
 
 with_build_env() {
+  echo "Running with build env: \"$*\"" >&2
   env \
     CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
