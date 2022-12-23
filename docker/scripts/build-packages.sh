@@ -37,13 +37,13 @@ build_openssl_1_1() {
   local url="https://www.openssl.org/source/openssl-1.1.1s.tar.gz"
   local sha256="c5ac01e760ee6ff0dab61d6b2bbd30146724d063eb322180c6f18a6f74e4b6aa"
   local file="openssl-1.1.1s.tar.gz"
-  local install_dir="/tmp/pkg/openssl_1_1"
+  local install_dir="/tmp/pkg"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
 
-  with_build_env ./Configure no-shared no-async --prefix="$install_dir" --openssldir="$install_dir" "$@"
+  with_build_env ./Configure no-shared no-async --prefix="$install_dir" --openssldir="$install_dir/openssl_1_1" "$@"
 
   make
   make install_sw
