@@ -30,6 +30,7 @@ RUN set -ex; \
 
 RUN set -ex; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+      --enable-static \
       --disable-jit-support;
 
 FROM base
