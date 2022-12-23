@@ -89,10 +89,12 @@ jobs:
             core.info('::info::Disabling binfmt_misc for testing');
             await exec.exec('docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*');
 
-            const tags = ${{ matrix.docker.tags }};
+            console.log(Object.keys(context));
+
+            const tags = ${{ toJson(matrix.docker.tags) }};
 
             for (const tag of tags) {
-              core.info(`::info::Testing image ${tag}`);
+              core.info(`::group::Testing image ${tag}`);
               const exitCode = await exec.exec(`bin/test --image ${tag}`);
 
               if (exitCode !== 0) {
