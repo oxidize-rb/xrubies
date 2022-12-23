@@ -75,8 +75,8 @@ jobs:
               'build-args': obj(${{ toJson(matrix.docker.build-args) }}),
               'tags': arr(tags),
               'labels': obj(${{ toJson(matrix.docker.labels) }}) + "\n" + ${{ toJson(steps.meta.outputs.labels) }},
-              'cache-from': "type=gha,scope=${cacheScope}",
-              'cache-to': "type=gha,mode=max,scope=${cacheScope}"
+              'cache-from': `type=gha,scope=${cacheScope}`,
+              'cache-to': `type=gha,mode=max,scope=${cacheScope}`
             });
 
       - name: Build and push
@@ -89,8 +89,6 @@ jobs:
           script: |
             core.info('::info::Disabling binfmt_misc for testing');
             await exec.exec('docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*');
-
-            console.log(Object.keys(context.workflow));
 
             const tags = ${{ toJson(matrix.docker.tags) }};
 
