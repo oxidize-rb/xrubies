@@ -38,14 +38,6 @@ jobs:
     steps:
       - uses: "actions/checkout@v3"
 
-      - uses: "ruby/setup-ruby@v1"
-        with:
-          ruby-version: "3.1"
-
-      - name: Setup utils
-        run: |
-          echo "$PWD/.github/workflows/bin" >> $GITHUB_PATH
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -70,39 +62,38 @@ jobs:
           images: ${{ matrix.docker.repo }}
           tags: type=sha
 
-      - name: Format args
+      - name: Build and push (args)
         uses: actions/github-script@v6
-        id: format
+        id: args
         with:
           script: |
-            const serialize = (val) => Object.entries(val).map(([key, value]) => `${key}=${value}`);
+            const arr = (val) => val.join("\n");
+            const obj = (val) => arr(Object.entries(val).map(([k, v]) => `${k}=${v}`));
 
-            const labels = ${{ matrix.docker.labels }};
-            core.setOutput('labels', serialize(labels));
-
-            const buildArgs = ${{ matrix.docker.build-args }};
-            core.setOutput('build-args', serialize(buildArgs));
+            core.setOutput('args', {
+              'context': '.',
+              'push': true,
+              'file': "${{ matrix.docker.file }}",
+              'platforms': ${{ matrix.docker.platforms }}.join(','),
+              'build-args': obj(${{ matrix.docker.build-args }}),
+              'tags': arr(${{ matrix.docker.tags }}),
+              'labels': obj(${{ matrix.docker.labels }})
+            });
 
       - name: Build and push
         uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          file: ${{ matrix.docker.file }}
-          platforms: ${{ join(matrix.docker.platforms, ',') }}
-          build-args: |
-            ${{ join(fromJson(steps.format.outputs.build-args), '\n') }}
-          tags: |
-            ${{ join(matrix.docker.tags, '\n') }}
-          labels: |
-            ${{ join(fromJson(steps.format.outputs.labels), '\n') }}
-            ${{ steps.meta.outputs.labels }}
+        with: ${{ fromJson(steps.args.outputs.args) }}
 
-      - name: "Test"
-        env:
-          DOCKER_TAGS: "${{ toJson(matrix.docker.tags) }}"
-        run: |
-          : Testing image
-          echo "::info::Disabling binfmt_misc for testing"
-          docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*
-          each-docker-tag.sh -- bin/test --image %DOCKER_TAG%
+      - name: Test
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.info('::info::Disabling binfmt_misc for testing');
+            await exec('docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-*');
+
+            const tags = ${{ matrix.docker.tags }};
+
+            for (const tag of tags) {
+              core.info(`::info::Testing image ${tag}`);
+              await exec(`bin/test --image ${tag}`);
+            }
