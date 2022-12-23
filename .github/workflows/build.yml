@@ -74,10 +74,10 @@ jobs:
               'context': '.',
               'push': true,
               'file': "${{ matrix.docker.file }}",
-              'platforms': ${{ matrix.docker.platforms }}.join(','),
-              'build-args': obj(${{ matrix.docker.build-args }}),
-              'tags': arr(${{ matrix.docker.tags }}),
-              'labels': obj(${{ matrix.docker.labels }})
+              'platforms': ${{ toJson(matrix.docker.platforms) }}.join(','),
+              'build-args': obj(${{ toJson(matrix.docker.build-args) }}),
+              'tags': arr(${{ toJson(matrix.docker.tags) }}),
+              'labels': obj(${{ toJson(matrix.docker.labels) }})
             });
 
       - name: Build and push
