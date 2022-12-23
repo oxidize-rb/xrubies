@@ -71,17 +71,16 @@ jobs:
           tags: type=sha
 
       - name: Format args
+        uses: actions/github-script@v6
         id: format
-        env:
-          LABELS: ${{ toJson(matrix.docker.labels) }}
-          BUILD_ARGS: ${{ toJson(matrix.docker.build-args) }}
-        run: |
-          : Format args
-          # Turn labels hash into key=value pairs
-          labels="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$LABELS")"
-          echo "labels=$labels" >> $GITHUB_OUTPUT
-          build_args="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$BUILD_ARGS")"
-          echo "build-args=$build_args" >> $GITHUB_OUTPUT
+        with:
+          script: |
+            const labels = JSON.parse(core.getInput('labels'));
+            const buildArgs = JSON.parse(core.getInput('build-args'));
+            const serialize = (val) => Object.entriesjs(val).map(([key, value]) => `${key}=${value}`);
+
+            core.setOutput('labels', serialize(labels));
+            core.setOutput('build-args', serialize(buildArgs));
 
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -91,11 +90,11 @@ jobs:
           file: ${{ matrix.docker.file }}
           platforms: ${{ join(matrix.docker.platforms, ',') }}
           build-args: |
-            ${{ join(steps.format.outputs.build-args, '\n') }}
+            ${{ join(fromJson(steps.format.outputs.build-args), '\n') }}
           tags: |
             ${{ join(matrix.docker.tags, '\n') }}
           labels: |
-            ${{ join(steps.format.outputs.labels, '\n') }}
+            ${{ join(fromJson(steps.format.outputs.labels), '\n') }}
             ${{ steps.meta.outputs.labels }}
 
       - name: "Test"
