@@ -75,11 +75,12 @@ jobs:
         id: format
         with:
           script: |
-            const labels = JSON.parse(core.getInput('labels'));
-            const buildArgs = JSON.parse(core.getInput('build-args'));
-            const serialize = (val) => Object.entriesjs(val).map(([key, value]) => `${key}=${value}`);
+            const serialize = (val) => Object.entries(val).map(([key, value]) => `${key}=${value}`);
 
+            const labels = ${{ matrix.docker.labels }};
             core.setOutput('labels', serialize(labels));
+
+            const buildArgs = ${{ matrix.docker.build-args }};
             core.setOutput('build-args', serialize(buildArgs));
 
       - name: Build and push
