@@ -80,7 +80,7 @@ jobs:
           # Turn labels hash into key=value pairs
           labels="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$LABELS")"
           echo "labels=$labels" >> $GITHUB_OUTPUT
-          build_args="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$BUILD_ARGS")")"
+          build_args="$(jq -r 'to_entries | map("\(.key)=\(.value)")' <<< "$BUILD_ARGS")"
           echo "build-args=$build_args" >> $GITHUB_OUTPUT
 
       - name: Build and push
