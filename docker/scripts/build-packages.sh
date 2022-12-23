@@ -83,7 +83,7 @@ build_zlib() {
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
 
-  with_build_env ./configure --prefix="$install_dir" "$@"
+  with_build_env ./configure --prefix="$install_dir" --shared "$@"
 
   make
   make install
