@@ -61,10 +61,9 @@ jobs:
             const arr = (val) => val.join("\n");
             const obj = (val) => arr(Object.entries(val).map(([k, v]) => `${k}=${v}`));
 
-            console.log(Object.keys(context.workflow));
-
             const tags = ${{ toJson(matrix.docker.tags) }};
-            const cacheScope = `${process.env.GITHUB_REF_NAME}-${tags[0]}`;
+            const tagSlug = tags[tags.length - 1].replace(/[^a-zA-Z0-9]/g, '-');
+            const cacheScope = `${process.env.GITHUB_REF_NAME}-${tagSlug}`;
 
             core.setOutput('args', {
               'context': '.',
