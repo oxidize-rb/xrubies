@@ -24,8 +24,8 @@ COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
     /build-packages.sh openssl_1_1 linux-x86_64; \
-    /build-packages.sh zlib; \
-    /build-packages.sh yaml; \
+    /build-packages.sh zlib --host x86_64-linux-musl; \
+    /build-packages.sh yaml --host x86_64-linux-musl; \
     rm /build-packages.sh;
 
 RUN set -ex; \
