@@ -25,7 +25,7 @@ COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
     /build-packages.sh openssl_1_1 linux-aarch64; \
-    /build-packages.sh zlib --host=aarch64-linux-musl; \
+    CHOST=aarch64-linux-musl /build-packages.sh zlib; \
     /build-packages.sh yaml --host=aarch64-linux-musl; \
     rm /build-packages.sh;
 
