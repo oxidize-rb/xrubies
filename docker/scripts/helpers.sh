@@ -44,6 +44,8 @@ purge_packages() {
       yum remove -y "${purge_list[@]}"
     fi
   fi
+
+  rm -rf /tmp/pkg;
 }
 
 if_centos() {

@@ -20,9 +20,15 @@ COPY docker/scripts/helpers.sh /
 
 FROM base as builder
 
+COPY docker/scripts/build-packages.sh /
 COPY docker/scripts/build-ruby.sh /
+
 RUN set -ex; \
-    /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+    /build-packages.sh openssl_1_1 linux-aarch64; \
+    rm /build-packages.sh;
+
+RUN set -ex; \
+    build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --disable-jit-support;
 
 FROM base

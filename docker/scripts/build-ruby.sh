@@ -63,7 +63,7 @@ configure() {
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
-        --with-opt-dir="/usr/lib/$archdir" \
+        --with-opt-dir="/usr/lib/$archdir:/tmp/pkg" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
