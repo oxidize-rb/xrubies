@@ -74,7 +74,7 @@ jobs:
         id: format
         env:
           LABELS: ${{ toJson(matrix.docker.labels) }}
-          BUILD_ARGS: ${{ toJson(matrix.docker.build_args) }}
+          BUILD_ARGS: ${{ toJson(matrix.docker.build-args) }}
         run: |
           : Format args
           # Turn labels hash into key=value pairs
