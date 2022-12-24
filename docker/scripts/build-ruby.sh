@@ -119,7 +119,7 @@ vendor_libs() {
     lib="$(readlink -f "$lib_or_libsymlink")"
     echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
-      found="$((ldd "$lib" | grep "$dep" | cut -f 3 -d ' ') || find "${CROSS_SYSROOT}/" -name "$dep" || find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$dep" || find "/tmp/" -name "$dep" || find /usr/lib -name "$dep")"
+      found="$((ldd "$lib" | grep "$dep" | cut -f 3 -d ' ') || (find "${CROSS_SYSROOT}/" -name "$dep" | grep ".") || (find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$dep" | grep ".") || (find "/tmp/" -name "$dep" | grep ".") || find /usr/lib -name "$dep")"
       needed+=("$found")
     done
   done
