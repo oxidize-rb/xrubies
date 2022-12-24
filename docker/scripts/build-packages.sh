@@ -122,13 +122,14 @@ build_yaml() {
 
 build_ffi() {
   local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.4.tar.gz"
-  local sha256="d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676"
+  local sha256="828639972716ed18833df7b659b32060591fe0eb625a8d34078920d33c2dc867"
   local file="libffi-3.4.4.tar.gz"
   local install_dir="$XRUBIES_PKG_ROOT/ffi"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
+  ./autogen.sh
   with_build_env ./configure --prefix="$install_dir" "$@"
 
   make -j "$(nproc)"
