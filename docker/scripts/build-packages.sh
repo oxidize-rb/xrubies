@@ -155,7 +155,12 @@ build_ffi() {
   tar -xf "$file" --strip-components=1
   ./autogen.sh
 
-  with_build_env ./configure --prefix="$install_dir" "$@"
+  with_build_env ./configure \
+    --prefix="$install_dir" \
+		--enable-pax_emutramp \
+		--enable-portable-binary \
+		--disable-exec-static-tramp \
+    "$@"
 
   make V=0 -j "$(nproc)"
   make install

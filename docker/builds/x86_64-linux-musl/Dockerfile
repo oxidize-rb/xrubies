@@ -26,7 +26,6 @@ RUN set -ex; \
     CHOST=x86_64-linux-musl /build-packages.sh zlib; \
     /build-packages.sh openssl_1_1 linux-x86_64; \
     /build-packages.sh yaml --host=x86_64-linux-musl --build=x86_64-linux-musl; \
-    /build-packages.sh ffi --host=x86_64-linux-musl --build=x86_64-linux-musl; \
     /build-packages.sh readline --host=x86_64-linux-musl --build=x86_64-linux-musl;
 
 RUN set -ex; \

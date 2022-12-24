@@ -27,7 +27,6 @@ RUN set -ex; \
     CHOST=aarch64-linux-musl /build-packages.sh zlib; \
     /build-packages.sh openssl_1_1 linux-aarch64; \
     /build-packages.sh yaml --host=aarch64-linux-musl --build=aarch64-linux-musl; \
-    /build-packages.sh ffi --host=aarch64-linux-musl --build=aarch64-linux-musl; \
     /build-packages.sh readline --host=aarch64-linux-musl --build=aarch64-linux-musl;
 
 
