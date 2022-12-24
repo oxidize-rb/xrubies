@@ -17,6 +17,11 @@ download_ruby() {
 }
 
 install_deps() {
+  # HACK: skip if target contains musl, clean this up later
+  if [[ "$RUBY_TARGET" == *"musl"* ]]; then
+    return
+  fi
+
   if_centos install_packages \
     zlib-devel \
     readline-devel \
@@ -56,14 +61,15 @@ configure() {
     CC="$ruby_cc" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
-    CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong" \
+    CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
+    CPPFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
     LDFLAGS="-pipe" \
       ./configure \
         --prefix="$ruby_install_dir" \
         --target="$RUBY_TARGET" \
         --build="$RUBY_TARGET" \
         --host="$RUBY_TARGET" \
-        --with-opt-dir="/usr/lib/$archdir:/tmp/pkg" \
+        --with-opt-dir="${CROSS_SYSROOT:-/usr/lib/$archdir}" \
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \

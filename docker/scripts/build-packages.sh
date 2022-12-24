@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+XRUBIES_PKG_ROOT="/tmp/pkg"
+
 main() {
   case "$1" in
     openssl_1_1)
@@ -48,10 +50,9 @@ download_source() {
 
 with_build_env() {
   echo "Running with build env: \"$*\"" >&2
-  default_cflags="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong"
   env \
     CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
-    CFLAGS="${CFLAGS:-$default_cflags} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
+    CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     "$@"
@@ -61,7 +62,7 @@ build_openssl_1_1() {
   local url="https://www.openssl.org/source/openssl-1.1.1s.tar.gz"
   local sha256="c5ac01e760ee6ff0dab61d6b2bbd30146724d063eb322180c6f18a6f74e4b6aa"
   local file="openssl-1.1.1s.tar.gz"
-  local install_dir="/tmp/pkg"
+  local install_dir="$XRUBIES_PKG_ROOT/openssl_1_1"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
@@ -79,7 +80,7 @@ build_zlib() {
   local url="https://zlib.net/zlib-1.2.13.tar.gz"
   local sha256="b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30"
   local file="zlib-1.2.13.tar.gz"
-  local install_dir="/tmp/pkg"
+  local install_dir="$XRUBIES_PKG_ROOT/zlib"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
@@ -98,7 +99,7 @@ build_yaml() {
   local sha256="c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4"
   local file="yaml-0.2.5.tar.gz"
 
-  local install_dir="/tmp/pkg"
+  local install_dir="$XRUBIES_PKG_ROOT/yaml"
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1

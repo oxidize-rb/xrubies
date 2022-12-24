@@ -30,6 +30,9 @@ RUN set -ex; \
 
 RUN set -ex; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+      --with-openssl-dir=/tmp/pkg/openssl_1_1 \
+      --with-zlib-dir=/tmp/pkg/zlib \
+      --with-yaml-dir=/tmp/pkg/yaml \
       --enable-static \
       --disable-jit-support;
 
