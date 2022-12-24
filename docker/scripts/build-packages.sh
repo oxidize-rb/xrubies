@@ -158,7 +158,7 @@ if [ "$1" == '--pkgconfig' ]; then
   dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
   path="$(echo "$dirs" | tr ' ' ':')"
 
-  echo "$path" | tr ':' '\n' | sort -u | tr '\n' ':' | sed 's/:$//'
+  echo "$path:${PKG_CONFIG_PATH:-}" | tr ':' '\n' | sort -u | tr '\n' ':' | sed 's/:$//'
 else
   main "$@"
 fi
