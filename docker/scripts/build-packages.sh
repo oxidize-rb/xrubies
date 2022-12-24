@@ -121,9 +121,10 @@ build_yaml() {
 }
 
 build_ffi() {
-  local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.4.tar.gz"
-  local sha256="828639972716ed18833df7b659b32060591fe0eb625a8d34078920d33c2dc867"
-  local file="libffi-3.4.4.tar.gz"
+  # needs autoconf 2.71+, which is not available yet on ubuntu 20.04
+  local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.3.tar.gz"
+  local sha256="66fe321955762834b47efefc7935d96d14fb0ebeb86f7d31516691cbd3b09b29"
+  local file="libffi-3.4.3.tar.gz"
   local install_dir="$XRUBIES_PKG_ROOT/ffi"
 
   enter_build_dir
