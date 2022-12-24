@@ -133,7 +133,9 @@ install_libtool() {
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
 
-  with_build_env ./configure --prefix="$CROSS_SYSROOT" "$@"
+  LDFLAGS="${LDFLAGS-} -L${CROSS_SYSROOT}/lib" PATH="$CROSS_SYSROOT/bin:$PATH" \
+    with_build_env ./configure --prefix="$CROSS_SYSROOT" "$@"
+
   make -j "$(nproc)"
   make install
   echo "Installed libtool to $CROSS_SYSROOT" >&2
