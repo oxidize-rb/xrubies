@@ -199,7 +199,7 @@ main() {
   cd /
   install_shim "$ruby_install_dir"
   purge_packages
-  shrink_rpaths "$ruby_install_dir"
+  shrink_rpaths "$ruby_install_dir" || true
 
   rm -rf "$build_dir" "${0}"
 }

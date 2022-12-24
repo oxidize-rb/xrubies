@@ -48,9 +48,10 @@ download_source() {
 
 with_build_env() {
   echo "Running with build env: \"$*\"" >&2
+  default_cflags="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong"
   env \
     CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
-    CFLAGS="${CFLAGS} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
+    CFLAGS="${CFLAGS:-$default_cflags} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     "$@"
