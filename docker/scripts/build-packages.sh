@@ -50,6 +50,7 @@ with_build_env() {
   echo "Running with build env: \"$*\"" >&2
   env \
     CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
+    CFLAGS="${CFLAGS} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     "$@"
@@ -67,7 +68,7 @@ build_openssl_1_1() {
 
   with_build_env ./Configure no-shared no-async --prefix="$install_dir" --openssldir="$install_dir/openssl_1_1" "$@"
 
-  make
+  make -j "$(nproc)"
   make install_sw
   popd
   echo "Built openssl 1.1 to $install_dir" >&2
@@ -85,7 +86,7 @@ build_zlib() {
 
   with_build_env ./configure --prefix="$install_dir" --shared "$@"
 
-  make
+  make -j "$(nproc)"
   make install
   popd
   echo "Built libz to $install_dir" >&2
@@ -102,7 +103,7 @@ build_yaml() {
   tar -xf "$file" --strip-components=1
 
   with_build_env ./configure --prefix="$install_dir" "$@"
-  make
+  make -j "$(nproc)"
   make install
   popd
   echo "Built libyaml to $install_dir" >&2
