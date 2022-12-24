@@ -18,17 +18,9 @@ main() {
       shift
       build_yaml "$@"
       ;;
-    ffi)
-      shift
-      build_ffi "$@"
-      ;;
     readline)
       shift
       build_readline "$@"
-      ;;
-    libtool)
-      shift
-      install_libtool "$@"
       ;;
     *)
       echo "Unknown package $1" >&2
@@ -122,50 +114,6 @@ build_yaml() {
   make install
   popd
   echo "Built libyaml to $install_dir" >&2
-}
-
-install_libtool() {
-  local url="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz"
-  local sha256="04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8"
-  local file="libtool-2.4.7.tar.gz"
-
-  enter_build_dir
-  download_source "$url" "$file" "$sha256"
-  tar -xf "$file" --strip-components=1
-
-  LDFLAGS="${LDFLAGS-} -L${CROSS_SYSROOT}/lib" PATH="$CROSS_SYSROOT/bin:$PATH" \
-    with_build_env ./configure --prefix="$CROSS_SYSROOT" "$@"
-
-  make -j "$(nproc)"
-  make install
-  echo "Installed libtool to $CROSS_SYSROOT" >&2
-}
-
-build_ffi() {
-  install_libtool "$@"
-
-  # needs autoconf 2.71+, which is not available yet on ubuntu 20.04
-  local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.2.tar.gz"
-  local sha256="0acbca9fd9c0eeed7e5d9460ae2ea945d3f1f3d48e13a4c54da12c7e0d23c313"
-  local file="libffi-3.4.2.tar.gz"
-  local install_dir="$XRUBIES_PKG_ROOT/ffi"
-
-  enter_build_dir
-  download_source "$url" "$file" "$sha256"
-  tar -xf "$file" --strip-components=1
-  ./autogen.sh
-
-  with_build_env ./configure \
-    --prefix="$install_dir" \
-		--enable-pax_emutramp \
-		--enable-portable-binary \
-		--disable-exec-static-tramp \
-    "$@"
-
-  make V=0 -j "$(nproc)"
-  make install
-  popd
-  echo "Built libffi to $install_dir" >&2
 }
 
 build_readline() {
