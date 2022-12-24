@@ -28,7 +28,7 @@ main() {
       ;;
     libtool)
       shift
-      build_libtool "$@"
+      install_libtool "$@"
       ;;
     *)
       echo "Unknown package $1" >&2
@@ -83,8 +83,8 @@ build_openssl_1_1() {
 
   with_build_env ./Configure no-shared no-async --prefix="$install_dir" --openssldir="$install_dir/openssl_1_1" "$@"
 
-  make V=0 -j "$(nproc)"
-  make install_sw
+  make -j "$(nproc)" > /dev/null
+  make install_sw > /dev/null
   popd
   echo "Built openssl 1.1 to $install_dir" >&2
 }
@@ -124,27 +124,23 @@ build_yaml() {
   echo "Built libyaml to $install_dir" >&2
 }
 
-build_libtool() {
+install_libtool() {
   local url="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz"
   local sha256="04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8"
   local file="libtool-2.4.7.tar.gz"
-  local install_dir="$XRUBIES_PKG_ROOT/libtool"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
 
-  with_build_env ./configure --prefix="$install_dir" "$@"
-  make V=0 -j "$(nproc)"
+  with_build_env ./configure --prefix="$CROSS_SYSROOT" "$@"
+  make -j "$(nproc)"
   make install
-  export LDFLAGS="-L $XRUBIES_PKG_ROOT/libtool/lib ${LDFLAGS:-}"
-  export PATH="$XRUBIES_PKG_ROOT/libtool/bin:$PATH"
-  popd
-  echo "Built libtool to $install_dir" >&2
+  echo "Installed libtool to $CROSS_SYSROOT" >&2
 }
 
 build_ffi() {
-  build_libtool "$@"
+  install_libtool "$@"
 
   # needs autoconf 2.71+, which is not available yet on ubuntu 20.04
   local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.2.tar.gz"
