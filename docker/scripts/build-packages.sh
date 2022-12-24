@@ -26,6 +26,10 @@ main() {
       shift
       build_readline "$@"
       ;;
+    libtool)
+      shift
+      build_libtool "$@"
+      ;;
     *)
       echo "Unknown package $1" >&2
       exit 1
@@ -79,7 +83,7 @@ build_openssl_1_1() {
 
   with_build_env ./Configure no-shared no-async --prefix="$install_dir" --openssldir="$install_dir/openssl_1_1" "$@"
 
-  make -j "$(nproc)"
+  make V=0 -j "$(nproc)"
   make install_sw
   popd
   echo "Built openssl 1.1 to $install_dir" >&2
@@ -97,7 +101,7 @@ build_zlib() {
 
   with_build_env ./configure --prefix="$install_dir" --shared "$@"
 
-  make -j "$(nproc)"
+  make V=0 -j "$(nproc)"
   make install
   popd
   echo "Built libz to $install_dir" >&2
@@ -114,26 +118,48 @@ build_yaml() {
   tar -xf "$file" --strip-components=1
 
   with_build_env ./configure --prefix="$install_dir" "$@"
-  make -j "$(nproc)"
+  make V=0 -j "$(nproc)"
   make install
   popd
   echo "Built libyaml to $install_dir" >&2
 }
 
+build_libtool() {
+  local url="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz"
+  local sha256="04e96c2404ea70c590c546eba4202a4e12722c640016c12b9b2f1ce3d481e9a8"
+  local file="libtool-2.4.7.tar.gz"
+  local install_dir="$XRUBIES_PKG_ROOT/libtool"
+
+  enter_build_dir
+  download_source "$url" "$file" "$sha256"
+  tar -xf "$file" --strip-components=1
+
+  with_build_env ./configure --prefix="$install_dir" "$@"
+  make V=0 -j "$(nproc)"
+  make install
+  export LDFLAGS="-L $XRUBIES_PKG_ROOT/libtool/lib ${LDFLAGS:-}"
+  export PATH="$XRUBIES_PKG_ROOT/libtool/bin:$PATH"
+  popd
+  echo "Built libtool to $install_dir" >&2
+}
+
 build_ffi() {
+  build_libtool "$@"
+
   # needs autoconf 2.71+, which is not available yet on ubuntu 20.04
   local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.2.tar.gz"
-  local sha256="0acbca9fd9c0eeed7e5d9460ae2ea945d3f1f3d48e13a4c54da12c7e0d23c313"
-  local file="libffi-3.4.2.tar.gz"
+  local sha256="66fe321955762834b47efefc7935d96d14fb0ebeb86f7d31516691cbd3b09b29"
+  local file="libffi-3.4.3.tar.gz"
   local install_dir="$XRUBIES_PKG_ROOT/ffi"
 
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
   ./autogen.sh
+
   with_build_env ./configure --prefix="$install_dir" "$@"
 
-  make -j "$(nproc)"
+  make V=0 -j "$(nproc)"
   make install
   popd
   echo "Built libffi to $install_dir" >&2
@@ -150,7 +176,7 @@ build_readline() {
   tar -xf "$file" --strip-components=1
 
   with_build_env ./configure --prefix="$install_dir" --enable-static --enable-shared "$@"
-  make -j "$(nproc)"
+  make V=0 -j "$(nproc)"
   make install
   popd
   echo "Built readline to $install_dir" >&2
