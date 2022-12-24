@@ -18,6 +18,14 @@ main() {
       shift
       build_yaml "$@"
       ;;
+    ffi)
+      shift
+      build_ffi "$@"
+      ;;
+    readline)
+      shift
+      build_readline "$@"
+      ;;
     *)
       echo "Unknown package $1" >&2
       exit 1
@@ -50,6 +58,7 @@ download_source() {
 
 with_build_env() {
   echo "Running with build env: \"$*\"" >&2
+
   env \
     CC="${CROSS_TOOLCHAIN_PREFIX}gcc" \
     CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-}" \
@@ -98,8 +107,8 @@ build_yaml() {
   local url="https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
   local sha256="c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4"
   local file="yaml-0.2.5.tar.gz"
-
   local install_dir="$XRUBIES_PKG_ROOT/yaml"
+
   enter_build_dir
   download_source "$url" "$file" "$sha256"
   tar -xf "$file" --strip-components=1
@@ -111,4 +120,46 @@ build_yaml() {
   echo "Built libyaml to $install_dir" >&2
 }
 
-main "$@"
+build_ffi() {
+  local url="https://github.com/libffi/libffi/archive/refs/tags/v3.4.4.tar.gz"
+  local sha256="d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676"
+  local file="libffi-3.4.4.tar.gz"
+  local install_dir="$XRUBIES_PKG_ROOT/ffi"
+
+  enter_build_dir
+  download_source "$url" "$file" "$sha256"
+  tar -xf "$file" --strip-components=1
+  with_build_env ./configure --prefix="$install_dir" "$@"
+
+  make -j "$(nproc)"
+  make install
+  popd
+  echo "Built libffi to $install_dir" >&2
+}
+
+build_readline() {
+  local url="https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"
+  local sha256="3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35"
+  local file="readline-8.2.tar.gz"
+  local install_dir="$XRUBIES_PKG_ROOT/readline"
+
+  enter_build_dir
+  download_source "$url" "$file" "$sha256"
+  tar -xf "$file" --strip-components=1
+
+  with_build_env ./configure --prefix="$install_dir" --enable-static --enable-shared "$@"
+  make -j "$(nproc)"
+  make install
+  popd
+  echo "Built readline to $install_dir" >&2
+}
+
+if [ "$1" == '--pkgconfig' ]; then
+  dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
+  path="$(echo "$dirs" | tr ' ' ':')"
+
+  echo "$path" | tr ':' '\n' | sort -u | tr '\n' ':' | sed 's/:$//'
+else
+  main "$@"
+fi
+

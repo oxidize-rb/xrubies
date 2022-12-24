@@ -24,13 +24,19 @@ COPY docker/scripts/build-packages.sh /
 COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
-    /build-packages.sh openssl_1_1 linux-aarch64; \
     CHOST=aarch64-linux-musl /build-packages.sh zlib; \
-    /build-packages.sh yaml --host=aarch64-linux-musl; \
-    rm /build-packages.sh;
+    /build-packages.sh openssl_1_1 linux-aarch64; \
+    /build-packages.sh yaml --host=aarch64-linux-musl --build=aarch64-linux-musl; \
+    /build-packages.sh ffi --host=aarch64-linux-musl --build=aarch64-linux-musl; \
+    /build-packages.sh readline --host=aarch64-linux-musl --build=aarch64-linux-musl;
+
 
 RUN set -ex; \
+    PKG_CONFIG_PATH="$(/build-packages.sh --pkgconfig)" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+      --with-openssl-dir=/tmp/pkg/openssl_1_1 \
+      --with-zlib-dir=/tmp/pkg/zlib \
+      --with-libyaml-dir=/tmp/pkg/yaml \
       --enable-static \
       --disable-jit-support;
 
