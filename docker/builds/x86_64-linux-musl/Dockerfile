@@ -13,7 +13,9 @@ ARG RUST_TARGET
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CROSS_TARGET_RUNNER" \
-    TARGET_DEB_ARCH="amd64"
+    TARGET_DEB_ARCH="amd64" \
+    XRUBIES_CROSS_TARGET="x86_64-linux-musl" \
+    XRUBIES_PKG_ROOT="/tmp/pkg"
 
 COPY docker/scripts/helpers.sh /
 
@@ -23,17 +25,17 @@ COPY docker/scripts/build-packages.sh /
 COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
-    CHOST=x86_64-linux-musl /build-packages.sh zlib; \
-    /build-packages.sh openssl_1_1 linux-x86_64; \
-    /build-packages.sh yaml --host=x86_64-linux-musl --build=x86_64-linux-musl; \
-    /build-packages.sh readline --host=x86_64-linux-musl --build=x86_64-linux-musl;
+    /opt/_internal/pkg/install zlib; \
+    /opt/_internal/pkg/install openssl_1_1; \
+    /opt/_internal/pkg/install yaml; \
+    /opt/_internal/pkg/install readline;
 
 RUN set -ex; \
-    PKG_CONFIG_PATH="$(/build-packages.sh --pkgconfig)" \
+    PKG_CONFIG_PATH="/tmp/pkg/lib/pkgconfig" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
-      --with-openssl-dir=/tmp/pkg/openssl_1_1 \
-      --with-zlib-dir=/tmp/pkg/zlib \
-      --with-yaml-dir=/tmp/pkg/yaml \
+      --with-openssl-dir=/tmp/pkg \
+      --with-zlib-dir=/tmp/pkg \
+      --with-yaml-dir=/tmp/pkg \
       --enable-static \
       --disable-jit-support;
 
