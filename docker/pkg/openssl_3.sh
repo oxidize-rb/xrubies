@@ -54,6 +54,7 @@ build() {
 		no-seed \
 		no-weak-ssl-ciphers \
     --libdir=lib \
+    --openssldir="$CROSS_SYSROOT/ssl" \
     --prefix="$install_dir"
 
   perl configdata.pm --dump
