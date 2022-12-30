@@ -39,7 +39,6 @@ build() {
 
   with_build_environment ./Configure \
     "$target" \
-    shared \
 		no-zlib \
 		no-async \
 		no-comp \
