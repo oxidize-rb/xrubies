@@ -21,7 +21,6 @@ COPY docker/scripts/helpers.sh /
 
 FROM base as builder
 
-COPY docker/scripts/build-packages.sh /
 COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
