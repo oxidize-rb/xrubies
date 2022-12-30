@@ -46,4 +46,11 @@ FROM base
 
 COPY --from=builder /opt/xrubies /opt/xrubies
 
+RUN set -ex; \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*;
+
 ENV PATH="/opt/xrubies/$RUBY_MINOR/bin:$PATH"

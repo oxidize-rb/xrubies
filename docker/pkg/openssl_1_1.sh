@@ -53,8 +53,8 @@ build() {
     no-ssl3-method \
 		no-seed \
 		no-weak-ssl-ciphers \
+    --openssldir=/usr/lib/ssl \
     --libdir=lib \
-    --openssldir="${CROSS_SYSROOT:-$install_dir}/ssl" \
     --prefix="$install_dir"
 
   perl configdata.pm --dump
