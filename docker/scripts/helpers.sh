@@ -45,7 +45,7 @@ purge_packages() {
     fi
   fi
 
-  rm -rf /tmp/pkg;
+  rm -rf "${XRUBIES_PKG_ROOT:-/tmp/pkg}" /opt/_internal/pkg
 }
 
 if_centos() {

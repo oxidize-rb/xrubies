@@ -42,12 +42,19 @@ main() {
   build_dir="$(new_build_directory)"
 
   cd "$build_dir"
+  log "Fetching $name-$version"
   fetch_source_and_verify "$source" "$srcdir" "$sha256"
 
   cd "$build_dir"
+  log "Building $name-$version"
   build
 
   cd "$build_dir"
+  log "Running tests"
+  check || abort "Tests failed"
+
+  cd "$build_dir"
+  log "Installing $name-$version"
   install
 
   rm -rf "$build_dir"
@@ -62,6 +69,11 @@ new_build_directory() {
     log "Entering build dir: $dir"
     mkdir -p "$dir"
     echo "$dir"
+}
+
+abort () {
+    log "$*, aborting"
+    exit 1
 }
 
 fetch_source_and_verify() {
@@ -83,15 +95,6 @@ fetch_source_and_verify() {
     rm "$file"
 }
 
-case "$#" in
-  1)
-    ;;
-  *)
-    usage
-    exit 1
-    ;;
-esac
-
 case "$1" in
   -h|--help)
     usage
@@ -103,7 +106,9 @@ if [ "$1" == '--pkgconfig' ]; then
   dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
   path="$(echo "$dirs" | tr ' ' ':')"
 
-  echo "$path:${PKG_CONFIG_PATH:-}" | tr ':' '\n' | sort -u | tr '\n' ':' | sed 's/:$//'
+  echo "$path:${PKG_CONFIG_PATH:-}" | sed 's/:$//'
 else
-  main "$@"
+  for pkg in "$@"; do
+    (main "$pkg")
+  done
 fi

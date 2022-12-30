@@ -102,6 +102,20 @@ EOF
   "$ruby_install_dir"/bin/ruby -v
 }
 
+find_lib() {
+  local dir="$1"
+  local name="$2"
+
+  lib_path="$(find "$dir" -name "$name" | grep "." | head -n 1)"
+
+  if [[ -z "$lib_path" ]]; then
+    echo "Could not find $lib in $ruby_install_dir" >&2
+    exit 1
+  fi
+
+  echo "$lib_path"
+}
+
 vendor_libs() {
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
@@ -119,7 +133,7 @@ vendor_libs() {
     lib="$(readlink -f "$lib_or_libsymlink")"
     echo "Checking $lib with patchelf" >&2
     for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
-      found="$((ldd "$lib" | grep "$dep" | cut -f 3 -d ' ') || (find "${CROSS_SYSROOT}/" -name "$dep" | grep ".") || (find /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" -name "$dep" | grep ".") || (find "/tmp/pkg/" -name "$dep" | grep ".") || find /usr/lib -name "$dep")"
+      found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ') || find_lib ${CROSS_SYSROOT}/ $dep || find_lib /usr/lib/$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine) $dep || find_lib ${XRUBIES_PKG_ROOT:-/tmp/pkg/} $dep || find_lib /usr/lib $dep"
       needed+=("$found")
     done
   done

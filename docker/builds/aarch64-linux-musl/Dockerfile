@@ -25,14 +25,14 @@ FROM base as builder
 COPY docker/scripts/build-ruby.sh /
 COPY docker/pkg/ /opt/_internal/pkg/
 
-RUN set -ex; \
-    /opt/_internal/pkg/install zlib; \
-    /opt/_internal/pkg/install openssl_1_1; \
-    /opt/_internal/pkg/install yaml; \
-    /opt/_internal/pkg/install readline;
+RUN /opt/_internal/pkg/install \
+      zlib \
+      yaml \
+      readline \
+      openssl;
 
 RUN set -ex; \
-    PKG_CONFIG_PATH="/tmp/pkg/lib/pkgconfig" \
+    PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-openssl-dir=/tmp/pkg \
       --with-zlib-dir=/tmp/pkg \

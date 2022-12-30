@@ -2,10 +2,10 @@
 # shellcheck disable=SC1091
 # shellcheck disable=SC2154
 
-export name="openssl_1_1"
-export version="1.1.1s"
+export name="openssl_3"
+export version="3.0.7"
 export source="https://www.openssl.org/source/openssl-${version}.tar.gz"
-export sha256="c5ac01e760ee6ff0dab61d6b2bbd30146724d063eb322180c6f18a6f74e4b6aa"
+export sha256="83049d042a260e696f62406ac5c08bf706fd84383f945cf21bd61e9ed95c396e"
 export srcdir="openssl-${version}"
 
 build() {
