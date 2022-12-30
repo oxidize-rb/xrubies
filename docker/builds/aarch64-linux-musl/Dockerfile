@@ -38,6 +38,7 @@ RUN set -ex; \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-readline-dir="$XRUBIES_PKG_ROOT" \
       --enable-static \
       --disable-jit-support;
 
