@@ -39,6 +39,7 @@ build() {
 
   with_build_environment ./Configure \
     "$target" \
+    shared \
 		no-zlib \
 		no-async \
 		no-comp \
@@ -52,8 +53,8 @@ build() {
     no-ssl3-method \
 		no-seed \
 		no-weak-ssl-ciphers \
-    --prefix="$install_dir" \
-    --openssldir="$install_dir/ssl"
+    --libdir=lib \
+    --prefix="$install_dir"
 
   perl configdata.pm --dump
   make -j "$(nproc)" > /dev/null

@@ -28,14 +28,15 @@ RUN /opt/_internal/pkg/install \
       zlib \
       yaml \
       readline \
-      openssl;
+      openssl && \
+    ls -R "$XRUBIES_PKG_ROOT";
 
 RUN set -ex; \
     PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
-      --with-openssl-dir=/tmp/pkg \
-      --with-zlib-dir=/tmp/pkg \
-      --with-yaml-dir=/tmp/pkg \
+      --with-openssl-dir="$XRUBIES_PKG_ROOT" \
+      --with-zlib-dir="$XRUBIES_PKG_ROOT" \
+      --with-yaml-dir="$XRUBIES_PKG_ROOT" \
       --enable-static \
       --disable-jit-support;
 
