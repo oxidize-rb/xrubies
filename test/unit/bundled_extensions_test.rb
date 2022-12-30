@@ -47,5 +47,6 @@ describe "Precompiled Ruby" do
     strlen = Fiddle::Function.new(libc["strlen"], [Fiddle::TYPE_VOIDP], Fiddle::TYPE_INT)
 
     assert_equal(5, strlen.call("hello"))
+    assert_equal(2, strlen.call("he\0llo"))
   end
 end
