@@ -22,6 +22,7 @@ COPY docker/scripts/helpers.sh /
 FROM base as builder
 
 COPY docker/scripts/build-ruby.sh /
+COPY docker/pkg/ /opt/_internal/pkg/
 
 RUN set -ex; \
     /opt/_internal/pkg/install zlib; \
