@@ -104,16 +104,17 @@ EOF
 
 find_lib() {
   local dir="$1"
-  local name="$2"
+  local name
+  name="$(basename "$2")"
 
   lib_path="$(find "$dir" -name "$name" | grep "." | head -n 1)"
 
   if [[ -z "$lib_path" ]]; then
     echo "Could not find $lib in $ruby_install_dir" >&2
-    exit 1
+    false
+  else
+    echo "$lib_path"
   fi
-
-  echo "$lib_path"
 }
 
 vendor_libs() {
