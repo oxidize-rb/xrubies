@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(File.expand_path("lib", __dir__))
 require "yaml"
 require "xrubies/matrix"
 
-DOCKER_BUILD = ENV.fetch("DOCKER_BUILD", "docker buildx build --load --progress=plain")
+DOCKER_BUILD = ENV.fetch("DOCKER_BUILD", "docker buildx build --load --progress=plain --cache-to type=inline --cache-from type=inline")
 
 task(:fmt) do
   Dir["**/*.rb", "**/*.rake", "Rakefile"].each do |file|

@@ -1,0 +1,109 @@
+#!/bin/bash
+# shellcheck disable=SC1090
+# shellcheck disable=SC1091
+# shellcheck disable=SC2154
+
+usage() {
+  cat <<EOF
+Usage: install <package name or file>
+
+Installs a package or package definition file so Ruby can be built with it.
+
+@example
+  $ install openssl_1_1
+
+@example
+  $ install zlib
+EOF
+}
+
+set -euo pipefail
+
+current_dir="$(dirname "${BASH_SOURCE[0]}")"
+
+source "$current_dir/lib.sh"
+
+main() {
+  if [ -f "$1" ]; then
+    source "$1"
+  elif [ -f "$current_dir/$1.sh" ]; then
+    source "$current_dir/$1.sh"
+  else
+    log "Unknown package $1" >&2
+    exit 1
+  fi
+
+  log "Installing $name-$version"
+
+  export install_dir="$XRUBIES_PKG_ROOT"
+  export cross_target="$XRUBIES_CROSS_TARGET"
+
+  mkdir -p "$install_dir/lib" "$install_dir/include" "$install_dir/share"
+  build_dir="$(new_build_directory)"
+
+  cd "$build_dir"
+  fetch_source_and_verify "$source" "$srcdir" "$sha256"
+
+  cd "$build_dir"
+  build
+
+  cd "$build_dir"
+  install
+
+  rm -rf "$build_dir"
+  rm -rf "$install_dir/share/man"
+
+  log "Installed $name-$version to $install_dir"
+}
+
+new_build_directory() {
+    local dir
+    dir="$(mktemp -d)"
+    log "Entering build dir: $dir"
+    mkdir -p "$dir"
+    echo "$dir"
+}
+
+fetch_source_and_verify() {
+    local url="$1"
+    local file="$2.tar.gz"
+    local sha256="$3"
+
+    log "Downloading $url"
+    curl --retry 3 -fsSLo "$file" "$url"
+    log "Verifying checksum of $file"
+
+    if ! echo "$sha256  $file" | sha256sum -c - >&2; then
+      log "Checksum failed, exiting"
+      rm "$file"
+      exit 1
+    fi
+
+    tar -xf "$file"
+    rm "$file"
+}
+
+case "$#" in
+  1)
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
+
+case "$1" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
+if [ "$1" == '--pkgconfig' ]; then
+  dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
+  path="$(echo "$dirs" | tr ' ' ':')"
+
+  echo "$path:${PKG_CONFIG_PATH:-}" | tr ':' '\n' | sort -u | tr '\n' ':' | sed 's/:$//'
+else
+  main "$@"
+fi
