@@ -77,6 +77,9 @@ configure() {
         --disable-jit-support \
         "$@" \
       || (cat config.log && false)
+
+  # TODO: remove this once we have a better way to handle this
+  cat ext/openssl/mkmf.log
 }
 
 install() {

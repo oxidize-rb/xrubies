@@ -58,10 +58,6 @@ main() {
   fi
 
   cd "$build_dir"
-  log "Running tests"
-  check || abort "Tests failed"
-
-  cd "$build_dir"
   log "Installing $name-$version"
   install
 
