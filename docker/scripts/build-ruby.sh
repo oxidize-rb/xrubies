@@ -78,13 +78,20 @@ configure() {
         "$@" \
       || (cat config.log && false)
 
-  # TODO: remove this once we have a better way to handle this
-  cat ext/openssl/mkmf.log
+  echo "Configuring ruby done" >&2
 }
 
 install() {
   echo "Installing ruby" >&2
   make -j "$(nproc)" install
+
+  echo "Printing mkmf.log files" >&2
+
+  # shellcheck disable=SC2044
+  for f in $(find ./ext -name mkmf.log); do
+    echo "========== $f ==========" >&2
+    cat "$f"
+  done
 }
 
 install_shim() {
