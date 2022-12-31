@@ -74,6 +74,7 @@ configure() {
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
+        --disable-jit-support \
         "$@" \
       || (cat config.log && false)
 }
@@ -121,7 +122,6 @@ find_lib() {
 vendor_libs() {
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
-  install_patchelf
 
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
@@ -194,8 +194,6 @@ shrink_rpaths() {
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
   echo "Listing contents of vendor/lib" >&2
   ls -l "$ruby_install_dir/vendor/lib" >&2
-
-  rm /usr/local/bin/patchelf
 }
 
 main() {

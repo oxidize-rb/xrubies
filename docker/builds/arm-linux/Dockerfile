@@ -11,14 +11,25 @@ ARG RUBY_SHA256
 ARG RUBY_TARGET
 ARG RUST_TARGET
 
+ARG FORCE_DISABLE_XRUBIES_PKG_CHECK=false
+
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CROSS_TARGET_RUNNER" \
     TARGET_DEB_ARCH="arm" \
     XRUBIES_CROSS_TARGET="arm-unknown-linux-gnueabihf" \
-    XRUBIES_PKG_ROOT="/tmp/pkg"
+    XRUBIES_PKG_ROOT="/tmp/pkg" \
+    FORCE_DISABLE_XRUBIES_PKG_CHECK="$FORCE_DISABLE_XRUBIES_PKG_CHECK"
 
 COPY docker/scripts/helpers.sh /
+
+COPY docker/pkg/install docker/pkg/patchelf.sh docker/pkg/lib.sh /opt/_internal/pkg/
+RUN set -ex; \
+    /opt/_internal/pkg/install \
+        --install-dir /usr/local \
+        --cross-target native \
+        patchelf; \
+    rm -rf /opt/_internal/pkg;
 
 FROM base as builder
 
@@ -40,11 +51,11 @@ RUN set -ex; \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
       --with-libffi-dir="$XRUBIES_PKG_ROOT" \
-      --with-readline-dir="$XRUBIES_PKG_ROOT" \
-      --disable-jit-support;
+      --with-readline-dir="$XRUBIES_PKG_ROOT";
 
 FROM base
 
+COPY --from=base /usr/local/bin/patchelf /usr/local/bin/
 COPY --from=builder /opt/xrubies /opt/xrubies
 
 RUN set -ex; \

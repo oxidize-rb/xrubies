@@ -74,6 +74,10 @@ module Xrubies
         File.join(ruby_platform.dir, "Dockerfile")
       end
 
+      def ruby_platform_slug
+        ruby_platform.slug
+      end
+
       def docker_labels
         {
           "org.oxidize-rb.ruby.version" => ruby_version.version,
