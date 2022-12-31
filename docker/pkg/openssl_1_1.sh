@@ -21,7 +21,7 @@ build() {
     aarch64-linux*)
       target="linux-aarch64"
       ;;
-    arm-linux*)
+    arm-unknown-linux-gnueabihf)
       target="linux-armv4"
       ;;
     x86_64-darwin*)
@@ -31,8 +31,7 @@ build() {
       target="darwin64-arm64-cc"
       ;;
     *)
-      echo "Unsupported target: $cross_target" >&2
-      exit 1
+      abort "Unsupported target: $cross_target"
       ;;
   esac
 

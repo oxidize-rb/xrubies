@@ -17,8 +17,9 @@ download_ruby() {
 }
 
 install_deps() {
-  # HACK: skip if target contains musl, clean this up later
-  if [[ "$RUBY_TARGET" == *"musl"* ]]; then
+  # HACK: we are packages manually, remove this check later once all containers
+  # use this pattern
+  if [ -d "${XRUBIES_PKG_ROOT:-/tmp/pkg}/lib" ]; then
     return
   fi
 
@@ -61,8 +62,8 @@ configure() {
     CC="$ruby_cc" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
-    CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
-    CPPFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
+    CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
+    CPPFLAGS="${CPPFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
     LDFLAGS="-pipe" \
       ./configure \
         --prefix="$ruby_install_dir" \
@@ -73,13 +74,29 @@ configure() {
         --disable-install-doc \
         --enable-shared \
         --enable-install-static-library \
+        --disable-jit-support \
         "$@" \
       || (cat config.log && false)
+
+  echo "Configuring ruby done" >&2
 }
 
 install() {
   echo "Installing ruby" >&2
-  make -j "$(nproc)" install
+
+  if make -j "$(nproc)" install; then
+    echo "Successfully installed Ruby" >&2
+  else
+    echo "Ruby install failed, printing mkmf.log files" >&2
+
+    # shellcheck disable=SC2044
+    for f in $(find ./ext -name mkmf.log); do
+      echo "========== $f ==========" >&2
+      cat "$f"
+    done
+
+    exit 1
+  fi
 }
 
 install_shim() {
@@ -120,7 +137,6 @@ find_lib() {
 vendor_libs() {
   echo "Copying all the libraries into the vendor directory" >&2;
   local ruby_install_dir="$1"
-  install_patchelf
 
   mkdir -p "$ruby_install_dir"/vendor/lib
   ruby_main="$ruby_install_dir/bin/ruby"
@@ -193,8 +209,6 @@ shrink_rpaths() {
   echo "Final rpath of ruby libs: $(patchelf --print-rpath "$ruby_install_dir/lib/libruby.so")" >&2
   echo "Listing contents of vendor/lib" >&2
   ls -l "$ruby_install_dir/vendor/lib" >&2
-
-  rm /usr/local/bin/patchelf
 }
 
 main() {

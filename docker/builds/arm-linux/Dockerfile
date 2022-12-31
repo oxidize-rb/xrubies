@@ -16,14 +16,10 @@ ARG FORCE_DISABLE_XRUBIES_PKG_CHECK=false
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CROSS_TARGET_RUNNER" \
-    TARGET_DEB_ARCH="arm64" \
-    XRUBIES_CROSS_TARGET="aarch64-linux-musl" \
+    TARGET_DEB_ARCH="arm" \
+    XRUBIES_CROSS_TARGET="arm-unknown-linux-gnueabihf" \
     XRUBIES_PKG_ROOT="/tmp/pkg" \
     FORCE_DISABLE_XRUBIES_PKG_CHECK="$FORCE_DISABLE_XRUBIES_PKG_CHECK"
-
-COPY docker/pkg/install docker/pkg/patchelf.sh docker/pkg/lib.sh /opt/_internal/pkg/
-RUN /opt/_internal/pkg/install --install-dir /usr/local --cross-target native \
-        patchelf;
 
 COPY docker/scripts/helpers.sh /
 
@@ -50,13 +46,13 @@ RUN /opt/_internal/pkg/install \
 
 RUN set -ex; \
     PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)" \
+    CFLAGS="${CFLAGS:-} -pthread" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
       --with-libffi-dir="$XRUBIES_PKG_ROOT" \
-      --with-readline-dir="$XRUBIES_PKG_ROOT" \
-      --enable-static;
+      --with-readline-dir="$XRUBIES_PKG_ROOT";
 
 FROM base
 

@@ -9,6 +9,8 @@ matrix.each do |entry|
     docker = matrix_hash["docker"]
 
     build_args = docker["build-args"].map { |key, value| "--build-arg #{key}=#{value}" }
+    disable_check = ENV["FORCE_DISABLE_XRUBIES_PKG_CHECK"] || "true"
+    build_args << "--build-arg FORCE_DISABLE_XRUBIES_PKG_CHECK=#{disable_check}"
     tags = docker["tags"].map { |tag| "--tag #{tag}" }
     labels = docker["labels"].map { |key, value| "--label #{key}=#{value}" }
     file = docker["file"]

@@ -64,6 +64,15 @@ jobs:
             const tags = ${{ toJson(matrix.docker.tags) }};
             const tagSlug = tags[tags.length - 1].replace(/[^a-zA-Z0-9]/g, '-');
             const cacheScope = `${process.env.GITHUB_REF_NAME}-${tagSlug}`;
+            const buildArgs = ${{ toJson(matrix.docker.build-args) }};
+
+            if (process.env.GITHUB_REF_NAME == null) {
+              throw new Error('GITHUB_REF_NAME is not set');
+            }
+
+            if (process.env.GITHUB_REF_NAME !== 'main') {
+              buildArgs['FORCE_DISABLE_XRUBIES_PKG_CHECK'] = "true";
+            }
 
             core.setOutput('args', {
               'context': '.',
@@ -71,7 +80,7 @@ jobs:
               'load': true,
               'file': "${{ matrix.docker.file }}",
               'platforms': ${{ toJson(matrix.docker.platforms) }}.join(','),
-              'build-args': obj(${{ toJson(matrix.docker.build-args) }}),
+              'build-args': obj(buildArgs),
               'tags': arr(tags),
               'labels': obj(${{ toJson(matrix.docker.labels) }}) + "\n" + ${{ toJson(steps.meta.outputs.labels) }},
               'cache-from': `type=gha,scope=${cacheScope}`,

@@ -24,6 +24,9 @@ current_dir="$(dirname "${BASH_SOURCE[0]}")"
 source "$current_dir/lib.sh"
 
 main() {
+  export install_dir="$XRUBIES_PKG_ROOT"
+  export cross_target="$XRUBIES_CROSS_TARGET"
+
   if [ -f "$1" ]; then
     source "$1"
   elif [ -f "$current_dir/$1.sh" ]; then
@@ -34,9 +37,6 @@ main() {
   fi
 
   log "Installing $name-$version"
-
-  export install_dir="$XRUBIES_PKG_ROOT"
-  export cross_target="$XRUBIES_CROSS_TARGET"
 
   mkdir -p "$install_dir/lib" "$install_dir/include" "$install_dir/share"
   build_dir="$(new_build_directory)"
@@ -49,16 +49,21 @@ main() {
   log "Building $name-$version"
   build
 
-  cd "$build_dir"
-  log "Running tests"
-  check || abort "Tests failed"
+  if [ "${FORCE_DISABLE_XRUBIES_PKG_CHECK:-false}" == "true" ]; then
+    log "Skipping tests due to FORCE_DISABLE_XRUBIES_PKG_CHECK=true"
+  else
+    cd "$build_dir"
+    log "Running tests"
+    check || abort "Tests failed"
+  fi
 
   cd "$build_dir"
   log "Installing $name-$version"
   install
 
+  log "Cleaning up $name-$version"
   rm -rf "$build_dir"
-  rm -rf "$install_dir/share/man"
+  rm -rf "$install_dir/share/man" "$install_dir/share/doc" "$install_dir/share/info"
 
   log "Installed $name-$version to $install_dir"
 }
@@ -82,7 +87,7 @@ fetch_source_and_verify() {
     local sha256="$3"
 
     log "Downloading $url"
-    curl --retry 3 -fsSLo "$file" "$url"
+    curl --retry 5 -fsSLo "$file" "$url"
     log "Verifying checksum of $file"
 
     if ! echo "$sha256  $file" | sha256sum -c - >&2; then
@@ -95,20 +100,46 @@ fetch_source_and_verify() {
     rm "$file"
 }
 
-case "$1" in
-  -h|--help)
-    usage
-    exit 0
-    ;;
-esac
+argv=()
 
-if [ "$1" == '--pkgconfig' ]; then
-  dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
-  path="$(echo "$dirs" | tr ' ' ':')"
+# loop through args, detect --install-dir and --cross-target
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --install-dir)
+      XRUBIES_PKG_ROOT="$2"
+      shift 2
+      ;;
+    --cross-target)
+      if [ "$2" == "native" ]; then
+        export CROSS_TOOLCHAIN_PREFIX=""
+        export CROSS_CMAKE_OBJECT_FLAGS=""
+        export XRUBIES_CROSS_TARGET
+        XRUBIES_CROSS_TARGET="$(gcc -dumpmachine)"
+        log "Requested native target: $XRUBIES_CROSS_TARGET"
+      else
+        export XRUBIES_CROSS_TARGET="$2"
+      fi
 
-  echo "$path:${PKG_CONFIG_PATH:-}" | sed 's/:$//'
-else
-  for pkg in "$@"; do
-    (main "$pkg")
-  done
-fi
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --pkgconfig)
+      dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
+      path="$(echo "$dirs" | tr ' ' ':')"
+
+      echo "$path:${PKG_CONFIG_PATH:-}" | sed 's/:$//'
+      exit 0
+      ;;
+    *)
+      argv+=("$1")
+      shift
+      ;;
+  esac
+done
+
+for pkg in "${argv[@]}"; do
+  (main "$pkg")
+done

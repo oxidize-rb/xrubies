@@ -29,6 +29,19 @@ namespace(:github) do
       GHA.set_output(:matrix, JSON.dump(include: matrix))
     end
 
+    desc("Generate GitHub Actions matrix for a specific Ruby platform (include multiple Ruby versions)")
+    task(:platform_matrix) do
+      matrix = Xrubies::Matrix.new.group_by(&:ruby_platform_slug).map do |ruby_platform_slug, entries|
+        xrubies = entries.map do |entry|
+          {"ruby-minor" => entry.ruby_minor, "docker-image" => entry.docker_image_name_full}
+        end
+
+        {"ruby-platform" => ruby_platform_slug, "xrubies" => xrubies}
+      end
+
+      GHA.set_output(:matrix, JSON.dump(include: matrix))
+    end
+
     desc("Simulate GitHub action build locally")
     task(:act, [:workflow]) do |t, args|
       require "rbconfig"

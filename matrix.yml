@@ -35,6 +35,14 @@ ruby-platform:
         tag: "edge"
         docker-platforms: ["linux/amd64"]
 
+  - slug: "arm-linux"
+    rust-target: "arm-unknown-linux-gnueabihf"
+    dir: docker/builds/arm-linux
+    images:
+      - slug: "ubuntu"
+        tag: "edge"
+        docker-platforms: ["linux/amd64"]
+
 ruby-version:
   - version: "3.2.0"
     slug: "3.2"
