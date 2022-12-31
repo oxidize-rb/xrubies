@@ -46,6 +46,7 @@ RUN /opt/_internal/pkg/install \
 
 RUN set -ex; \
     PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)" \
+    CFLAGS="${CFLAGS:-} -pthread" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \

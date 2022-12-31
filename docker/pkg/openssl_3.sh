@@ -27,6 +27,12 @@ build() {
 		"no-weak-ssl-ciphers"
   )
 
+  local configure_opts=(
+    "--libdir=lib"
+    "--openssldir=/usr/lib/ssl"
+    "--prefix=$install_dir"
+  )
+
   case "$cross_target" in
     x86_64-linux*)
       target="linux-x86_64"
@@ -39,7 +45,6 @@ build() {
       ;;
     arm-unknown-linux-gnueabihf)
       target="linux-armv4"
-      features+=("no-threads")
       ;;
     x86_64-darwin*)
       target="darwin64-x86_64-cc"
@@ -61,9 +66,7 @@ build() {
   with_build_environment ./Configure \
     "$target" \
     "${features[@]}" \
-    --libdir=lib \
-    --openssldir=/usr/lib/ssl \
-    --prefix="$install_dir"
+    "${configure_opts[@]}"
 
   perl configdata.pm --dump
   make -j "$(nproc)" > /dev/null
