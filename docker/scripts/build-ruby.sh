@@ -83,15 +83,20 @@ configure() {
 
 install() {
   echo "Installing ruby" >&2
-  make -j "$(nproc)" install
 
-  echo "Printing mkmf.log files" >&2
+  if make -j "$(nproc)" install > /dev/null; then
+    echo "Successfully installed Ruby" >&2
+  else
+    echo "Ruby install failed, printing mkmf.log files" >&2
 
-  # shellcheck disable=SC2044
-  for f in $(find ./ext -name mkmf.log); do
-    echo "========== $f ==========" >&2
-    cat "$f"
-  done
+    # shellcheck disable=SC2044
+    for f in $(find ./ext -name mkmf.log); do
+      echo "========== $f ==========" >&2
+      cat "$f"
+    done
+
+    exit 1
+  fi
 }
 
 install_shim() {
