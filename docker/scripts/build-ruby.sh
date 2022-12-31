@@ -17,8 +17,9 @@ download_ruby() {
 }
 
 install_deps() {
-  # HACK: skip if target contains musl, clean this up later
-  if [[ "$RUBY_TARGET" == *"musl"* ]]; then
+  # HACK: we are packages manually, remove this check later once all containers
+  # use this pattern
+  if [ -d "${XRUBIES_PKG_ROOT:-/tmp/pkg}/lib" ]; then
     return
   fi
 
