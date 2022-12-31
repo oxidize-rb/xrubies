@@ -28,6 +28,7 @@ RUN /opt/_internal/pkg/install \
       zlib \
       yaml \
       readline \
+      libffi \
       openssl && \
     ls -R "$XRUBIES_PKG_ROOT";
 
@@ -36,7 +37,8 @@ RUN set -ex; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
-      --with-yaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-libffi-dir="$XRUBIES_PKG_ROOT" \
       --with-readline-dir="$XRUBIES_PKG_ROOT" \
       --enable-static \
       --disable-jit-support;

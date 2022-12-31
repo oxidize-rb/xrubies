@@ -29,6 +29,7 @@ RUN /opt/_internal/pkg/install \
       zlib \
       yaml \
       readline \
+      libffi \
       openssl && \
     ls -R "$XRUBIES_PKG_ROOT";
 
@@ -38,6 +39,7 @@ RUN set -ex; \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-libffi-dir="$XRUBIES_PKG_ROOT" \
       --with-readline-dir="$XRUBIES_PKG_ROOT" \
       --enable-static \
       --disable-jit-support;
