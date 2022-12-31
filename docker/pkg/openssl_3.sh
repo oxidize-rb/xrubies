@@ -11,6 +11,22 @@ export srcdir="openssl-${version}"
 build() {
   cd "${srcdir}" || exit 1
 
+  local features=(
+    "no-zlib"
+		"no-async"
+		"no-comp"
+		"no-idea"
+		"no-mdc2"
+		"no-rc5"
+		"no-ec2m"
+		"no-sm2"
+		"no-sm4"
+		"no-ssl3"
+    "no-ssl3-method"
+		"no-seed"
+		"no-weak-ssl-ciphers"
+  )
+
   case "$cross_target" in
     x86_64-linux*)
       target="linux-x86_64"
@@ -23,6 +39,7 @@ build() {
       ;;
     arm-unknown-linux-gnueabihf)
       target="linux-armv4"
+      features+=("no-threads")
       ;;
     x86_64-darwin*)
       target="darwin64-x86_64-cc"
@@ -37,22 +54,13 @@ build() {
   esac
 
 
+  if [[ "$cross_target" == *"musl"* ]]; then
+    features+=("no-shared")
+  fi
+
   with_build_environment ./Configure \
     "$target" \
-    no-shared \
-		no-zlib \
-		no-async \
-		no-comp \
-		no-idea \
-		no-mdc2 \
-		no-rc5 \
-		no-ec2m \
-		no-sm2 \
-		no-sm4 \
-		no-ssl3 \
-    no-ssl3-method \
-		no-seed \
-		no-weak-ssl-ciphers \
+    "${features[@]}" \
     --libdir=lib \
     --openssldir=/usr/lib/ssl \
     --prefix="$install_dir"
