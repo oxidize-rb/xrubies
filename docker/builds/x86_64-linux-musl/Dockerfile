@@ -24,24 +24,35 @@ FROM base as builder
 COPY docker/scripts/build-ruby.sh /
 COPY docker/pkg/ /opt/_internal/pkg/
 
-RUN set -ex; \
-    /opt/_internal/pkg/install zlib; \
-    /opt/_internal/pkg/install openssl_1_1; \
-    /opt/_internal/pkg/install yaml; \
-    /opt/_internal/pkg/install readline;
+RUN /opt/_internal/pkg/install \
+      zlib \
+      yaml \
+      readline \
+      libffi \
+      openssl && \
+    ls -R "$XRUBIES_PKG_ROOT";
 
 RUN set -ex; \
-    PKG_CONFIG_PATH="/tmp/pkg/lib/pkgconfig" \
+    PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)" \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
-      --with-openssl-dir=/tmp/pkg \
-      --with-zlib-dir=/tmp/pkg \
-      --with-yaml-dir=/tmp/pkg \
+      --with-openssl-dir="$XRUBIES_PKG_ROOT" \
+      --with-zlib-dir="$XRUBIES_PKG_ROOT" \
+      --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-libffi-dir="$XRUBIES_PKG_ROOT" \
+      --with-readline-dir="$XRUBIES_PKG_ROOT" \
       --enable-static \
       --disable-jit-support;
 
 FROM base
 
 COPY --from=builder /opt/xrubies /opt/xrubies
+
+RUN set -ex; \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*;
 
 ENV PATH="/opt/xrubies/$RUBY_MINOR/bin:$PATH"
 

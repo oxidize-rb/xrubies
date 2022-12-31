@@ -20,6 +20,12 @@ build() {
   make -j "$(nproc)" > /dev/null
 }
 
+check() {
+  cd "${srcdir}" || exit 1
+
+  make check
+}
+
 install() {
   cd "${srcdir}" || exit 1
 
