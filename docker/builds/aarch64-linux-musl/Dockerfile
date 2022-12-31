@@ -45,6 +45,7 @@ RUN /opt/_internal/pkg/install \
       yaml \
       readline \
       libffi \
+      gdbm \
       openssl && \
     ls -R "$XRUBIES_PKG_ROOT";
 
@@ -56,6 +57,7 @@ RUN set -ex; \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
       --with-libffi-dir="$XRUBIES_PKG_ROOT" \
       --with-readline-dir="$XRUBIES_PKG_ROOT" \
+      --with-gdbm-dir="$XRUBIES_PKG_ROOT" \
       --enable-static;
 
 FROM base

@@ -77,4 +77,14 @@ describe "Precompiled Ruby" do
       assert_equal(2, strlen.call("he\0llo"))
     end
   end
+
+  it "works with bundled compiled gems (dbm)" do
+    require "dbm"
+
+    dir = Dir.mktmpdir
+    db = DBM.open(File.join(dir, "test.dbm"), 0666, DBM::WRCREAT)
+    db["hello"] = "world"
+
+    assert_equal("world", db["hello"])
+  end
 end
