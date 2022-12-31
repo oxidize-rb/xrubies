@@ -84,7 +84,7 @@ configure() {
 install() {
   echo "Installing ruby" >&2
 
-  if make -j "$(nproc)" install > /dev/null; then
+  if make -j "$(nproc)" install; then
     echo "Successfully installed Ruby" >&2
   else
     echo "Ruby install failed, printing mkmf.log files" >&2
