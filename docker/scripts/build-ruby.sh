@@ -62,8 +62,8 @@ configure() {
     CC="$ruby_cc" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
-    CFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
-    CPPFLAGS="-fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing" \
+    CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
+    CPPFLAGS="${CPPFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
     LDFLAGS="-pipe" \
       ./configure \
         --prefix="$ruby_install_dir" \

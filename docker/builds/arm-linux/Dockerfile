@@ -14,7 +14,7 @@ ARG RUST_TARGET
 ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CROSS_TARGET_RUNNER" \
-    TARGET_DEB_ARCH="arm64" \
+    TARGET_DEB_ARCH="arm" \
     XRUBIES_CROSS_TARGET="arm-unknown-linux-gnueabihf" \
     XRUBIES_PKG_ROOT="/tmp/pkg"
 
@@ -41,7 +41,6 @@ RUN set -ex; \
       --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
       --with-libffi-dir="$XRUBIES_PKG_ROOT" \
       --with-readline-dir="$XRUBIES_PKG_ROOT" \
-      --enable-static \
       --disable-jit-support;
 
 FROM base
