@@ -78,11 +78,11 @@ describe "Precompiled Ruby" do
     end
   end
 
-  it "works with bundled compiled gems (dbm)" do
-    require "dbm"
+  it "works with bundled compiled gems (gdbm)" do
+    require "gdbm"
 
     dir = Dir.mktmpdir
-    db = DBM.open(File.join(dir, "test.dbm"), 0666, DBM::WRCREAT)
+    db = GDBM.open(File.join(dir, "test.dbm"), 0666, GDBM::WRCREAT)
     db["hello"] = "world"
 
     assert_equal("world", db["hello"])
