@@ -149,7 +149,7 @@ vendor_libs() {
   for lib_or_libsymlink in ${libs_to_patch}; do
     lib="$(readlink -f "$lib_or_libsymlink")"
     echo "Checking $lib with patchelf" >&2
-    for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
+    for dep in $(patchelf --print-needed "$lib" | grep -E '(libffi|libgdbm|libnurses|libreadline|libsqlite|libssl|libyaml|libz|libcrypto|libcrypt)'); do
       found="$(ldd "$lib" | grep "$dep" | cut -f 3 -d ' ' || find_lib "$CROSS_SYSROOT" "$dep" || find_lib /usr/lib/"$("${CROSS_TOOLCHAIN_PREFIX}"gcc -dumpmachine)" "$dep" || find_lib "${XRUBIES_PKG_ROOT:-/tmp/pkg/}" "$dep" || find_lib /usr/lib "$dep")"
       needed+=("$found")
     done
