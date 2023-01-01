@@ -17,15 +17,25 @@ ENV RUBY_TARGET="$RUBY_TARGET" \
     RUST_TARGET="$RUST_TARGET" \
     RUBY_SHIM_RUNNER="$CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUNNER" \
     TARGET_DEB_ARCH="arm64" \
-    FORCE_DISABLE_XRUBIES_PKG_CHECK="$FORCE_DISABLE_XRUBIES_PKG_CHECK"
+    FORCE_DISABLE_XRUBIES_PKG_CHECK="$FORCE_DISABLE_XRUBIES_PKG_CHECK" \
+    XRUBIES_PKG_ROOT="/tmp/pkg" \
+    XRUBIES_CROSS_TARGET="aarch64-linux"
 
-
-COPY docker/pkg/install docker/pkg/patchelf.sh docker/pkg/lib.sh /opt/_internal/pkg/
+COPY docker/pkg /opt/_internal/pkg
 RUN set -ex; \
     /opt/_internal/pkg/install \
         --install-dir /usr/local \
         --cross-target native \
-        patchelf; \
+        patchelf;
+
+RUN set -ex; \
+    /opt/_internal/pkg/install \
+      zlib \
+      yaml \
+      readline \
+      libffi \
+      openssl_1_1 \
+      openssl_3 && \
     rm -rf /opt/_internal/pkg;
 
 COPY docker/scripts/helpers.sh /
@@ -33,7 +43,12 @@ COPY docker/scripts/helpers.sh /
 FROM base as builder
 
 COPY docker/scripts/build-ruby.sh /
-RUN /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256"
+RUN /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
+      --with-openssl-dir="$XRUBIES_PKG_ROOT" \
+      --with-zlib-dir="$XRUBIES_PKG_ROOT" \
+      --with-libyaml-dir="$XRUBIES_PKG_ROOT" \
+      --with-libffi-dir="$XRUBIES_PKG_ROOT" \
+      --with-readline-dir="$XRUBIES_PKG_ROOT";
 
 FROM base
 

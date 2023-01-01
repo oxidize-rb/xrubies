@@ -36,6 +36,10 @@ main() {
     exit 1
   fi
 
+  if [ "${XRUBIES_PKG_NAMESPACE:-false}" == "true" ]; then
+    install_dir="$install_dir/$name"
+  fi
+
   log "Installing $name-$version"
 
   mkdir -p "$install_dir/lib" "$install_dir/include" "$install_dir/share"
@@ -120,6 +124,14 @@ while [ $# -gt 0 ]; do
         export XRUBIES_CROSS_TARGET="$2"
       fi
 
+      shift 2
+      ;;
+    --namespace)
+      export XRUBIES_PKG_NAMESPACE="true"
+      shift
+      ;;
+    --force-disable-check)
+      export FORCE_DISABLE_XRUBIES_PKG_CHECK="$2"
       shift 2
       ;;
     -h|--help)

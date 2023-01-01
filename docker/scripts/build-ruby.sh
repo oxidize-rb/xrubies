@@ -17,9 +17,15 @@ download_ruby() {
 }
 
 install_deps() {
-  # HACK: we are packages manually, remove this check later once all containers
+  # HACK: we are packaging manually, remove this check later once all containers
   # use this pattern
   if [ -d "${XRUBIES_PKG_ROOT:-/tmp/pkg}/lib" ]; then
+    return
+  fi
+
+  # HACK: we are packaging manually, remove this check later once all containers
+  # use this pattern
+  if [ -d "/opt/_internal/libs" ]; then
     return
   fi
 
