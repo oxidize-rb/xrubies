@@ -28,6 +28,10 @@ RUN set -ex; \
         --cross-target native \
         patchelf;
 
+COPY docker/scripts/helpers.sh /
+
+FROM base as builder
+
 RUN set -ex; \
     /opt/_internal/pkg/install \
       zlib \
@@ -37,10 +41,6 @@ RUN set -ex; \
       openssl_1_1 \
       openssl_3 && \
     rm -rf /opt/_internal/pkg;
-
-COPY docker/scripts/helpers.sh /
-
-FROM base as builder
 
 COPY docker/scripts/build-ruby.sh /
 RUN /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
