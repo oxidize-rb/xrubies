@@ -16,42 +16,6 @@ download_ruby() {
   cd src
 }
 
-install_deps() {
-  # HACK: we are packaging manually, remove this check later once all containers
-  # use this pattern
-  if [ -d "${XRUBIES_PKG_ROOT:-/tmp/pkg}/lib" ]; then
-    return
-  fi
-
-  # HACK: we are packaging manually, remove this check later once all containers
-  # use this pattern
-  if [ -d "/opt/_internal/libs" ]; then
-    return
-  fi
-
-  if_centos install_packages \
-    zlib-devel \
-    readline-devel \
-    sqlite-devel \
-    openssl-devel \
-    libyaml-devel \
-    libffi-devel \
-    gdbm-devel \
-    ncurses-devel
-
-  if_ubuntu dpkg --add-architecture "$TARGET_DEB_ARCH"
-
-  if_ubuntu install_packages \
-    zlib1g-dev:"$TARGET_DEB_ARCH" \
-    libreadline-dev:"$TARGET_DEB_ARCH" \
-    libsqlite0-dev:"$TARGET_DEB_ARCH" \
-    libssl-dev:"$TARGET_DEB_ARCH" \
-    libyaml-dev:"$TARGET_DEB_ARCH" \
-    libffi-dev:"$TARGET_DEB_ARCH" \
-    libgdbm-dev:"$TARGET_DEB_ARCH" \
-    libncurses5-dev:"$TARGET_DEB_ARCH"
-}
-
 configure() {
   echo "Configuring ruby" >&2
   local ruby_install_dir="$1"
@@ -228,18 +192,9 @@ main() {
 
   local ruby_install_dir="/opt/xrubies/$ruby_minor"
 
-  if [ ! -d "$ruby_install_dir" ]; then
-    download_ruby "$ruby_version" "$ruby_minor" "$ruby_sha256"
-    install_deps
-    configure "$ruby_install_dir" "$@"
-    install
-  fi
-
-  if [ "${DOCKER_CHECKPOINT:-false}" == "true" ]; then
-    echo "Checkpointing ruby build" >&2
-    exit 0
-  fi
-
+  download_ruby "$ruby_version" "$ruby_minor" "$ruby_sha256"
+  configure "$ruby_install_dir" "$@"
+  install
   vendor_libs "$ruby_install_dir"
   cd /
   install_shim "$ruby_install_dir"
