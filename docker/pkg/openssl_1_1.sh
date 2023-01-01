@@ -11,6 +11,9 @@ export srcdir="openssl-${version}"
 build() {
   cd "${srcdir}" || exit 1
 
+  source /helpers.sh
+  if_centos install_packages perl-IPC-Cmd
+
   local features=(
     "no-zlib"
 		"no-async"
@@ -84,4 +87,5 @@ check() {
 install() {
   cd "${srcdir}" || exit 1
   make install_sw
+  if_centos purge_packages
 }
