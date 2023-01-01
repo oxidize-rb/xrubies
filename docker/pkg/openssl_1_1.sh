@@ -32,7 +32,7 @@ build() {
 
   local configure_opts=(
     "--libdir=lib"
-    "--openssldir=/usr/lib/ssl"
+    "--openssldir=/etc/ssl"
     "--prefix=$install_dir"
   )
 
