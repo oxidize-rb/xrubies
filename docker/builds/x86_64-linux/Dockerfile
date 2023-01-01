@@ -37,8 +37,7 @@ RUN set -ex; \
       yaml \
       readline \
       libffi \
-      openssl_1_1 \
-      openssl_3 && \
+      openssl && \
     rm -rf /opt/_internal/pkg;
 
 COPY docker/scripts/build-ruby.sh /
