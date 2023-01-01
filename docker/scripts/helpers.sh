@@ -7,6 +7,20 @@ source /lib.sh
 
 purge_list=()
 
+install_persistent_packages() {
+  old_purge_list=("${purge_list[@]}")
+  install_packages "${@}"
+  purge_list=("${old_purge_list[@]}")
+
+  if grep -i ubuntu /etc/os-release; then
+    apt-get clean -y -qq
+    rm -rf /var/apt/lists/*
+  else
+    yum clean all
+    rm -rf /var/cache/yum
+  fi
+}
+
 install_packages() {
   if grep -i ubuntu /etc/os-release; then
     apt-get update -y -qq
@@ -42,6 +56,7 @@ purge_packages() {
       rm -rf /var/apt/lists/*
     else
       yum remove -y "${purge_list[@]}"
+      rm -rf /var/cache/yum
     fi
   fi
 }
