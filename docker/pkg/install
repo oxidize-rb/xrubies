@@ -106,7 +106,6 @@ fetch_source_and_verify() {
 
 argv=()
 
-# loop through args, detect --install-dir and --cross-target
 while [ $# -gt 0 ]; do
   case "$1" in
     --install-dir)
@@ -138,12 +137,9 @@ while [ $# -gt 0 ]; do
       usage
       exit 0
       ;;
-    --pkgconfig)
-      dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
-      path="$(echo "$dirs" | tr ' ' ':')"
-
-      echo "$path:${PKG_CONFIG_PATH:-}" | sed 's/:$//'
-      exit 0
+    -*)
+      log "Unknown option $1" >&2
+      exit 1
       ;;
     *)
       argv+=("$1")

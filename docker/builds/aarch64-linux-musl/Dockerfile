@@ -38,7 +38,7 @@ RUN set -ex; \
       readline \
       libffi \
       openssl; \
-    export PKG_CONFIG_PATH="$(/opt/_internal/pkg/install --pkgconfig)"; \
+    export PKG_CONFIG_PATH="$XRUBIES_PKG_ROOT/lib/pkgconfig"; \
     /build-ruby.sh "$RUBY_VERSION" "$RUBY_MINOR" "$RUBY_SHA256" \
       --with-openssl-dir="$XRUBIES_PKG_ROOT" \
       --with-zlib-dir="$XRUBIES_PKG_ROOT" \
