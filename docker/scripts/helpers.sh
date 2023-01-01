@@ -44,8 +44,6 @@ purge_packages() {
       yum remove -y "${purge_list[@]}"
     fi
   fi
-
-  rm -rf "${XRUBIES_PKG_ROOT:-/tmp/pkg}" /opt/_internal/pkg
 }
 
 if_centos() {
