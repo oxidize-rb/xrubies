@@ -55,11 +55,11 @@ ARG RUBY_MINOR
 
 COPY --from=builder /opt/xrubies /opt/xrubies
 
-ENV RUBY_ROOT="/opt/xrubies/$RUBY_MINOR" \
-    GEM_HOME="$RUBY_ROOT/bundle" \
-    PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
+ENV RUBY_ROOT "/opt/xrubies/$RUBY_MINOR"
+ENV GEM_HOME "$RUBY_ROOT/bundle"
+ENV PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
     BUNDLE_SILENCE_ROOT_WARNING=1 \
-	BUNDLE_APP_CONFIG="$GEM_HOME" \
+    BUNDLE_APP_CONFIG="$GEM_HOME" \
     RUBY_VERSION="$RUBY_VERSION"
 
 # adjust permissions of a few directories for running "gem install" as an arbitrary user
