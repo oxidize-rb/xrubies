@@ -50,6 +50,7 @@ RUN set -ex; \
 FROM base
 
 ARG RUBY_VERSION
+ARG RUBY_MINOR
 
 COPY --from=builder /opt/xrubies /opt/xrubies
 
