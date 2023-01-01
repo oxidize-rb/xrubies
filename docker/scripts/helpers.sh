@@ -59,30 +59,3 @@ if_ubuntu() {
     eval "${@}"
   fi
 }
-
-install_patchelf() {
-  local td
-  td="$(mktemp -d)"
-  local cpu_type
-
-  if [[ "$TARGET_DEB_ARCH" == "arm64" ]]; then
-    cpu_type="aarch64"
-  elif [[ "$TARGET_DEB_ARCH" == "amd64" ]]; then
-    cpu_type="x86_64"
-  elif [[ "$TARGET_DEB_ARCH" == "armhf" ]]; then
-    cpu_type="armhf"
-  else
-    echo "Unsupported architecture: $TARGET_DEB_ARCH" >&2
-    exit 1
-  fi
-
-  echo "Installing patchelf for $cpu_type" >&2
-
-  local url
-  url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
-  curl -fsSL "$url" | tar -xz -C "$td"
-
-  mv "$td/bin/patchelf" /usr/local/bin
-  rm -rf "$td"
-  echo "Installed patchelf: $(patchelf --version)" >&2
-}

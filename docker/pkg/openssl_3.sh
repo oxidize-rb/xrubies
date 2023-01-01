@@ -11,6 +11,12 @@ export srcdir="openssl-${version}"
 build() {
   cd "${srcdir}" || exit 1
 
+  # if ! perl -e 'use 5.14.0' &> /dev/null; then
+  #   log "Perl 5.14.0 or newer is required, installing it..."
+  #   source /helpers.sh
+  #   if_centos install_packages perl-IPC-Cmd
+  # fi
+
   local features=(
     "no-zlib"
 		"no-async"
