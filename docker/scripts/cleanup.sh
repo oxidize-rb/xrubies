@@ -25,6 +25,12 @@ main() {
     rm -rf /var/cache/yum
   fi
 
+  rm -rf \
+    /tmp/*  \
+    /usr/local/doc \
+    /usr/local/man \
+    /usr/local/bin/cmake-gui
+
   rm -rf "${0}"
 }
 
