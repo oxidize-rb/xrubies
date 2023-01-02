@@ -1,0 +1,49 @@
+name: "Code Scanning"
+
+on:
+  - push
+  - "workflow_dispatch"
+
+concurrency:
+  group: "build-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  set-matrix:
+    name: "⊹"
+    runs-on: "ubuntu-latest"
+    outputs:
+      matrix: "${{ steps.set-matrix.outputs.matrix }}"
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - uses: "ruby/setup-ruby@v1"
+        with:
+          ruby-version: "3.1"
+
+      - id: "set-matrix"
+        run: rake github:actions:matrix
+
+  code-scanning:
+    name: "${{ matrix.short-slug }}"
+    needs: "set-matrix"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - name: Scan for vulnerabilities
+        id: scan
+        uses: crazy-max/ghaction-container-scan@v2
+        with:
+          image: ${{ matrix.docker.tags.0 }}
+          dockerfile: ${{ matrix.docker.file }}
+          annotations: true
+
+      - name: Upload SARIF file
+        if: ${{ steps.scan.outputs.sarif != '' }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
