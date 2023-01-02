@@ -5,7 +5,7 @@ on:
   - "workflow_dispatch"
 
 concurrency:
-  group: "build-${{ github.ref }}"
+  group: "code-scanning-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
