@@ -109,6 +109,11 @@ jobs:
               }
             }
 
+      - uses: "./.github/actions/xrubies-scan"
+        with:
+          image: ${{ matrix.docker.tags[0] }}
+          upload-to-github: false
+
       - name: Login to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: docker/login-action@v2
