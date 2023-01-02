@@ -50,12 +50,20 @@ install_packages() {
 }
 
 purge_packages() {
+  local to_purge
+
   if (( ${#purge_list[@]} )); then
+    to_purge=("${purge_list[@]}")
+  else
+    to_purge=("${@}")
+  fi
+
+  if (( ${#to_purge[@]} )); then
     if grep -i ubuntu /etc/os-release; then
-      apt-get purge -qq --assume-yes --auto-remove "${purge_list[@]}"
+      apt-get purge -qq --assume-yes --auto-remove "${to_purge[@]}"
       rm -rf /var/apt/lists/*
     else
-      yum remove -y "${purge_list[@]}"
+      yum remove -y "${to_purge[@]}"
       rm -rf /var/cache/yum
     fi
   fi
