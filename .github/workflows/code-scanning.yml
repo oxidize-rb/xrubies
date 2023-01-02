@@ -1,0 +1,33 @@
+name: "Code Scanning"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"
+
+concurrency:
+  group: "code-scanning-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  set-matrix:
+    name: "⊹"
+    runs-on: "ubuntu-latest"
+    outputs:
+      matrix: "${{ steps.set-matrix.outputs.matrix }}"
+    steps:
+      - uses: "actions/checkout@v3"
+      - id: "set-matrix"
+        run: rake github:actions:matrix
+  code-scanning:
+    name: "${{ matrix.short-slug }}"
+    needs: "set-matrix"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix: "${{ fromJson(needs.set-matrix.outputs.matrix) }}"
+    steps:
+      - uses: "./.github/actions/xrubies-scan"
+        with:
+          image: ${{ matrix.docker.tags[0] }}
+          upload-to-github: true

@@ -69,3 +69,6 @@ RUN set -ex; \
     mkdir -p /opt/_internal/ssl/; \
     curl --retry 3 -o "/opt/_internal/ssl/certifi.pem" -sSL https://mkcert.org/generate/;
 ENV SSL_CERT_FILE "/opt/_internal/ssl/certifi.pem"
+
+COPY /docker/scripts/cleanup.sh /cleanup.sh
+RUN /cleanup.sh
