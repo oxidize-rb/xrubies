@@ -21,7 +21,7 @@ runs:
         : Build ${{ inputs.image }}
         tmpdir="$(mktemp -d)"
         dockerfile="$tmpdir/Dockerfile"
-        generated_image_id="xrubies-dir-$(date +%s))"
+        generated_image_id="xrubies-dir-$(date +%s)"
 
         cat > "$dockerfile" <<EOF
         FROM ${{ inputs.image }} as base
