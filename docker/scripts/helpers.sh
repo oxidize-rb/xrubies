@@ -69,14 +69,22 @@ purge_packages() {
   fi
 }
 
+is_centos() {
+  grep -q -i centos /etc/os-release
+}
+
+is_ubuntu() {
+  grep -q -i ubuntu /etc/os-release
+}
+
 if_centos() {
-  if grep -q -i centos /etc/os-release; then
+  if is_centos; then
     eval "${@}"
   fi
 }
 
 if_ubuntu() {
-  if grep -q -i ubuntu /etc/os-release; then
+  if is_ubuntu; then
     eval "${@}"
   fi
 }
