@@ -34,12 +34,23 @@ jobs:
     steps:
       - uses: "actions/checkout@v3"
 
+      - name: Build image
+        run: |
+          cat > /tmp/Dockerfile <<EOF
+          FROM ${{ matrix.docker.tags[0] }} as base
+          FROM scratch
+          COPY --from=base /opt/xrubies /opt/xrubies
+          COPY --from=base /opt/_internal /opt/_internal
+          EOF
+
+          docker build -t xrubies-dir -f /tmp/Dockerfile .
+
       - name: Scan for vulnerabilities
         id: scan
         uses: crazy-max/ghaction-container-scan@v2
         with:
-          image: ${{ matrix.docker.tags[0] }}
-          dockerfile: ${{ matrix.docker.file }}
+          image: xrubies-dir
+          dockerfile: /tmp/Dockerfile
           annotations: true
 
       - name: Upload SARIF file
