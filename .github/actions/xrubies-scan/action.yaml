@@ -42,15 +42,15 @@ runs:
         echo "::endgroup::"
 
         if [ ${{ inputs.upload-to-github }} == 'true' ]; then
-          echo "scan-arguments={\"image\":\"$generated_image_id\",\"dockerfile\":\"$dockerfile\"} > $GITHUB_OUTPUT
+          echo "args={\"image\":\"$generated_image_id\",\"dockerfile\":\"$dockerfile\"}" > $GITHUB_OUTPUT
         else
-          echo "scan-arguments={\"image\": \"$generated_image_id\"} > $GITHUB_OUTPUT
+          echo "args={\"image\":\"$generated_image_id\"}" > $GITHUB_OUTPUT
         fi
 
     - name: Scan for vulnerabilities
       id: scan
       uses: crazy-max/ghaction-container-scan@v2
-      with: ${{ fromJSON(steps.build.outputs.scan-arguments) }}
+      with: ${{ fromJson(steps.build.outputs.args) }}
 
     - name: Upload SARIF file
       if: ${{ steps.scan.outputs.sarif != '' && inputs.upload-to-github == 'true' }}
