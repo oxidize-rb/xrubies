@@ -38,7 +38,7 @@ jobs:
         id: scan
         uses: crazy-max/ghaction-container-scan@v2
         with:
-          image: ${{ matrix.docker.tags.0 }}
+          image: ${{ matrix.docker.tags[0] }}
           dockerfile: ${{ matrix.docker.file }}
           annotations: true
 
