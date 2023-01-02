@@ -39,14 +39,15 @@ jobs:
           cat > /tmp/Dockerfile <<EOF
           FROM ${{ matrix.docker.tags[0] }} as base
 
+          # Remove some known unfixable vulnerabilities
+          RUN set -ex; \
+              rm -f opt/xrubies/2.7/lib/ruby/gems/2.7.0/specifications/default/bundler-2.1.4.gemspec;
+
           FROM scratch
 
           COPY --from=base /opt/xrubies /opt/xrubies
           COPY --from=base /opt/_internal /opt/_internal
 
-          # Remove some known unfixable vulnerabilities
-          RUN set -ex; \
-              rm -f opt/xrubies/2.7/lib/ruby/gems/2.7.0/specifications/default/bundler-2.1.4.gemspec;
           EOF
 
           docker build -t xrubies-dir -f /tmp/Dockerfile .
