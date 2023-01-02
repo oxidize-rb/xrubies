@@ -78,6 +78,14 @@ module Xrubies
         ruby_platform.slug
       end
 
+      def rust_target
+        ruby_platform.rust_target
+      end
+
+      def base_image_tag
+        image.tag
+      end
+
       def docker_labels
         {
           "org.oxidize-rb.ruby.version" => ruby_version.version,

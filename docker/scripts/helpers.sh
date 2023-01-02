@@ -7,6 +7,20 @@ source /lib.sh
 
 purge_list=()
 
+install_persistent_packages() {
+  old_purge_list=("${purge_list[@]}")
+  install_packages "${@}"
+  purge_list=("${old_purge_list[@]}")
+
+  if grep -i ubuntu /etc/os-release; then
+    apt-get clean -y -qq
+    rm -rf /var/apt/lists/*
+  else
+    yum clean all
+    rm -rf /var/cache/yum
+  fi
+}
+
 install_packages() {
   if grep -i ubuntu /etc/os-release; then
     apt-get update -y -qq
@@ -42,10 +56,9 @@ purge_packages() {
       rm -rf /var/apt/lists/*
     else
       yum remove -y "${purge_list[@]}"
+      rm -rf /var/cache/yum
     fi
   fi
-
-  rm -rf "${XRUBIES_PKG_ROOT:-/tmp/pkg}" /opt/_internal/pkg
 }
 
 if_centos() {
@@ -58,31 +71,4 @@ if_ubuntu() {
   if grep -q -i ubuntu /etc/os-release; then
     eval "${@}"
   fi
-}
-
-install_patchelf() {
-  local td
-  td="$(mktemp -d)"
-  local cpu_type
-
-  if [[ "$TARGET_DEB_ARCH" == "arm64" ]]; then
-    cpu_type="aarch64"
-  elif [[ "$TARGET_DEB_ARCH" == "amd64" ]]; then
-    cpu_type="x86_64"
-  elif [[ "$TARGET_DEB_ARCH" == "armhf" ]]; then
-    cpu_type="armhf"
-  else
-    echo "Unsupported architecture: $TARGET_DEB_ARCH" >&2
-    exit 1
-  fi
-
-  echo "Installing patchelf for $cpu_type" >&2
-
-  local url
-  url="https://github.com/NixOS/patchelf/releases/download/0.17.0/patchelf-0.17.0-$cpu_type.tar.gz"
-  curl -fsSL "$url" | tar -xz -C "$td"
-
-  mv "$td/bin/patchelf" /usr/local/bin
-  rm -rf "$td"
-  echo "Installed patchelf: $(patchelf --version)" >&2
 }

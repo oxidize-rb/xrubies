@@ -11,6 +11,31 @@ export srcdir="openssl-${version}"
 build() {
   cd "${srcdir}" || exit 1
 
+  source /helpers.sh
+  if_centos install_packages perl-IPC-Cmd
+
+  local features=(
+    "no-zlib"
+		"no-async"
+		"no-comp"
+		"no-idea"
+		"no-mdc2"
+		"no-rc5"
+		"no-ec2m"
+		"no-sm2"
+		"no-sm4"
+		"no-ssl3"
+    "no-ssl3-method"
+		"no-seed"
+		"no-weak-ssl-ciphers"
+  )
+
+  local configure_opts=(
+    "--libdir=lib"
+    "--openssldir=/etc/ssl"
+    "--prefix=$install_dir"
+  )
+
   case "$cross_target" in
     x86_64-linux*)
       target="linux-x86_64"
@@ -31,30 +56,20 @@ build() {
       target="darwin64-arm64-cc"
       ;;
     *)
-      abort "Unsupported target: $cross_target"
+      echo "Unsupported target: $cross_target" >&2
+      exit 1
       ;;
   esac
 
 
+  if [[ "$cross_target" == *"musl"* ]]; then
+    features+=("no-shared")
+  fi
+
   with_build_environment ./Configure \
     "$target" \
-    no-shared \
-		no-zlib \
-		no-async \
-		no-comp \
-		no-idea \
-		no-mdc2 \
-		no-rc5 \
-		no-ec2m \
-		no-sm2 \
-		no-sm4 \
-		no-ssl3 \
-    no-ssl3-method \
-		no-seed \
-		no-weak-ssl-ciphers \
-    --openssldir=/usr/lib/ssl \
-    --libdir=lib \
-    --prefix="$install_dir"
+    "${features[@]}" \
+    "${configure_opts[@]}"
 
   perl configdata.pm --dump
   make -j "$(nproc)" > /dev/null
@@ -72,4 +87,5 @@ check() {
 install() {
   cd "${srcdir}" || exit 1
   make install_sw
+  if_centos purge_packages
 }

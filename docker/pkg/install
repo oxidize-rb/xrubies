@@ -36,6 +36,10 @@ main() {
     exit 1
   fi
 
+  if [ "${XRUBIES_PKG_NAMESPACE:-false}" == "true" ]; then
+    install_dir="$install_dir/$name"
+  fi
+
   log "Installing $name-$version"
 
   mkdir -p "$install_dir/lib" "$install_dir/include" "$install_dir/share"
@@ -102,7 +106,6 @@ fetch_source_and_verify() {
 
 argv=()
 
-# loop through args, detect --install-dir and --cross-target
 while [ $# -gt 0 ]; do
   case "$1" in
     --install-dir)
@@ -122,16 +125,21 @@ while [ $# -gt 0 ]; do
 
       shift 2
       ;;
+    --namespace)
+      export XRUBIES_PKG_NAMESPACE="true"
+      shift
+      ;;
+    --force-disable-check)
+      export FORCE_DISABLE_XRUBIES_PKG_CHECK="$2"
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
       ;;
-    --pkgconfig)
-      dirs="$(find "$XRUBIES_PKG_ROOT" -name 'pkgconfig' -type d)"
-      path="$(echo "$dirs" | tr ' ' ':')"
-
-      echo "$path:${PKG_CONFIG_PATH:-}" | sed 's/:$//'
-      exit 0
+    -*)
+      log "Unknown option $1" >&2
+      exit 1
       ;;
     *)
       argv+=("$1")
