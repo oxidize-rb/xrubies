@@ -59,8 +59,6 @@ ENV PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
     BUNDLE_APP_CONFIG="$GEM_HOME" \
     RUBY_VERSION="$RUBY_VERSION"
 
-RUN sh -c "(env | sort) && exit 1"
-
 # adjust permissions of a few directories for running "gem install" as an arbitrary user
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 
