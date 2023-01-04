@@ -12,7 +12,7 @@ build() {
   cd "${srcdir}" || exit 1
 
   source /helpers.sh
-  if_centos install_packages perl-IPC-Cmd
+  if_centos install_packages perl-IPC-Cmd perl-core
 
   local features=(
     "no-zlib"
