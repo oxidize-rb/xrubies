@@ -21,21 +21,11 @@ ruby 3.2.0rc1 (2022-12-06 master 81e274c990) [x86_64-linux-gnu]
 ### Building a custom image
 
 ```dockerfile
-FROM ghcr.io/oxidize-rb/arch64-linux:3.1-ubuntu as ruby-3.1
-FROM ghcr.io/oxidize-rb/arch64-linux:3.0-ubuntu as ruby-3.0
-FROM ghcr.io/oxidize-rb/arch64-linux:2.7-ubuntu as ruby-2.7
+FROM ghcr.io/oxidize-rb/arch64-linux:3.2-centos
 
-# Copy the Ruby binaries from the build containers
-COPY --from=ruby-3.1 /opt/xrubies/3.1 /opt/xrubies/3.1
-COPY --from=ruby-3.0 /opt/xrubies/3.0 /opt/xrubies/3.0
-COPY --from=ruby-2.7 /opt/xrubies/2.7 /opt/xrubies/2.7
+// Whatever you want...
 
-FROM ghcr.io/oxidize-rb/arch64-linux:ubuntu
-
-# Now you can use the Ruby binaries like normal...
-RUN /opt/xrubies/3.1/bin/ruby -v
-RUN /opt/xrubies/3.0/bin/ruby -v
-RUN /opt/xrubies/2.7/bin/ruby -v
+RUN /opt/xrubies/3.2/bin/ruby -v
 ```
 
 ## FAQ
