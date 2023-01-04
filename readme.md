@@ -69,6 +69,8 @@ This tool takes a lot of inspiration from `rake-compiler-dock`, but differs in a
    but we can do the same for other gems. This is what
    [`auditwheel`][auditwheel] does for python.
 
+7. Only supports non-EOL versions of Ruby.
+
 [cross-rs]: https://github.com/cross-rs/cross
 [packages]: https://github.com/oxidize-rb/xrubies/packages
 [vendor-libs]: https://github.com/oxidize-rb/xrubies/blob/1f5402baa7982d25931183091b9515b20e90c0e7/docker/scripts/build-ruby.sh#L120
