@@ -65,7 +65,7 @@ ENV PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 
 COPY docker/scripts/install-root-cert.sh /
-RUN /install-root-certs.sh
+RUN /install-root-cert.sh
 
 COPY docker/scripts/cleanup.sh /cleanup.sh
 RUN /cleanup.sh
