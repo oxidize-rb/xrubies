@@ -31,6 +31,7 @@ COPY docker/pkg/ /opt/_internal/pkg/
 
 RUN set -ex; \
     /opt/_internal/pkg/install --install-dir /usr/local --cross-target native \
+      libclang \
       patchelf; \
     /opt/_internal/pkg/install \
       zlib \

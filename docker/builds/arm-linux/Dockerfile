@@ -30,6 +30,7 @@ COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
     /opt/_internal/pkg/install --install-dir /usr/local --cross-target native \
+      libclang \
       patchelf; \
     /opt/_internal/pkg/install \
       zlib \
