@@ -59,15 +59,13 @@ ENV PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
     BUNDLE_APP_CONFIG="$GEM_HOME" \
     RUBY_VERSION="$RUBY_VERSION"
 
-# Our openssl cannot find the system CA certs, so we use mkcert to pull
-# Mozilla's CA certs
-RUN set -ex; \
-    mkdir -p /opt/_internal/ssl/; \
-    curl --retry 3 -o "/opt/_internal/ssl/certifi.pem" -sSL https://mkcert.org/generate/;
-ENV SSL_CERT_FILE "/opt/_internal/ssl/certifi.pem"
+COPY docker/scripts/install-root-cert.sh /
+RUN /install-root-certs.sh
 
 # adjust permissions of a few directories for running "gem install" as an arbitrary user
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 
-COPY /docker/scripts/cleanup.sh /cleanup.sh
+COPY docker/scripts/cleanup.sh /cleanup.sh
 RUN /cleanup.sh
+
+ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER="${CROSS_TOOLCHAIN_PREFIX}gcc"
