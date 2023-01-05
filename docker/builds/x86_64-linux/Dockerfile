@@ -61,6 +61,7 @@ ENV PATH="$GEM_HOME/bin:$RUBY_ROOT/bin:$PATH" \
 
 COPY docker/scripts/install-root-cert.sh /
 RUN /install-root-cert.sh
+ENV SSL_CERT_FILE "/opt/_internal/ssl/certifi.pem"
 
 # adjust permissions of a few directories for running "gem install" as an arbitrary user
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"

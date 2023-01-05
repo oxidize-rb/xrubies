@@ -67,6 +67,7 @@ RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 
 COPY docker/scripts/install-root-cert.sh /
 RUN /install-root-cert.sh
+ENV SSL_CERT_FILE "/opt/_internal/ssl/certifi.pem"
 
 COPY docker/scripts/cleanup.sh /cleanup.sh
 RUN /cleanup.sh
