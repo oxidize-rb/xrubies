@@ -47,7 +47,7 @@ main() {
 
   cd "$build_dir"
   log "Fetching $name-$version"
-  fetch_source_and_verify "$source" "$srcdir" "$sha256"
+  fetch_source_and_verify "$source" "$sha256"
 
   cd "$build_dir"
   log "Building $name-$version"
@@ -87,8 +87,8 @@ abort () {
 
 fetch_source_and_verify() {
     local url="$1"
-    local file="$2.tar.gz"
-    local sha256="$3"
+    local file="${url##*/}"
+    local sha256="$2"
 
     log "Downloading $url"
     curl --retry 5 -fsSLo "$file" "$url"
@@ -100,6 +100,7 @@ fetch_source_and_verify() {
       exit 1
     fi
 
+    log "Unpacking $file"
     tar -xf "$file"
     rm "$file"
 }

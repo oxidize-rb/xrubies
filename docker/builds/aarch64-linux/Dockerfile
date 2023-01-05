@@ -30,6 +30,7 @@ COPY docker/scripts/build-ruby.sh /
 
 RUN set -ex; \
     /opt/_internal/pkg/install --install-dir /usr/local --cross-target native \
+      libclang \
       patchelf; \
     /opt/_internal/pkg/install \
       zlib \
@@ -72,3 +73,5 @@ ENV SSL_CERT_FILE "/opt/_internal/ssl/certifi.pem"
 
 COPY /docker/scripts/cleanup.sh /cleanup.sh
 RUN /cleanup.sh
+
+ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER="${CROSS_TOOLCHAIN_PREFIX}gcc"
