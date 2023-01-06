@@ -28,12 +28,20 @@ configure() {
   ruby_cc="${CROSS_TOOLCHAIN_PREFIX}gcc"
   archdir="$($ruby_cc -dumpmachine)"
 
+
+  # Omitting the following flags:
+  #   1. no-omit-frame-pointer:
+  #   2. no-strict-aliasing: can have large negative impacts on loop
+  #      vectorization, if you are relying on it, ideally you can fix the code to
+  #      avoid aliasing. If you can't fix the code, you can use the
+  #      -fno-strict-aliasing flag to disable strict aliasing for the your
+  #      gem.
   env
     CC="$ruby_cc" \
     CXX="${CROSS_TOOLCHAIN_PREFIX}g++" \
     AR="${CROSS_TOOLCHAIN_PREFIX}ar" \
-    CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
-    CPPFLAGS="${CPPFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-omit-frame-pointer -fno-fast-math -fstack-protector-strong -fno-strict-aliasing -O2" \
+    CFLAGS="${CFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-fast-math -fstack-protector-strong -O3" \
+    CPPFLAGS="${CPPFLAGS:-} ${CROSS_CMAKE_OBJECT_FLAGS:-} -fno-fast-math -fstack-protector-strong -O3" \
     LDFLAGS="-pipe" \
       ./configure \
         --prefix="$ruby_install_dir" \

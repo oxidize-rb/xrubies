@@ -1,14 +1,11 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-  "name": "Debian",
-  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "name": "aarch64-linux:3.2-ubuntu",
+  "image": "ghcr.io/oxidize-rb/aarch64-linux:3.2-ubuntu",
   "features": {
+    "ghcr.io/devcontainers/features/rust:1": {},
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "containerEnv": {
-    "XRUBIES_PKG_ROOT": "/tmp/pkg",
-    "XRUBIES_CROSS_TARGET": "aarch64-linux"
   }
 }
