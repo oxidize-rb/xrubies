@@ -44,22 +44,22 @@ ruby-platform:
         docker-platforms: ["linux/amd64"]
 
 ruby-version:
-  - version: "3.2.0"
+  - version: "3.3.0"
     slug: "3.2"
     minor: "3.2"
-    sha256: "daaa78e1360b2783f98deeceb677ad900f3a36c0ffa6e2b6b19090be77abc272"
+    sha256: "96518814d9832bece92a85415a819d4893b307db5921ae1f0f751a9a89a56b7d"
 
-  - version: "3.1.3"
+  - version: "3.2.2"
+    slug: "3.2"
+    minor: "3.2"
+    sha256: "96c57558871a6748de5bc9f274e93f4b5aad06cd8f37befa0e8d94e7b8a423bc"
+
+  - version: "3.1.4"
     slug: "3.1"
     minor: "3.1"
-    sha256: "5ea498a35f4cd15875200a52dde42b6eb179e1264e17d78732c3a57cd1c6ab9e"
+    sha256: "a3d55879a0dfab1d7141fdf10d22a07dbf8e5cdc4415da1bde06127d5cc3c7b6"
 
-  - version: "3.0.5"
+  - version: "3.0.6"
     slug: "3.0"
     minor: "3.0"
-    sha256: "9afc6380a027a4fe1ae1a3e2eccb6b497b9c5ac0631c12ca56f9b7beb4848776"
-
-  - version: "2.7.7"
-    slug: "2.7"
-    minor: "2.7"
-    sha256: "e10127db691d7ff36402cfe88f418c8d025a3f1eea92044b162dd72f0b8c7b90"
+    sha256: "6e6cbd490030d7910c0ff20edefab4294dfcd1046f0f8f47f78b597987ac683e"
