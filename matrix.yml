@@ -5,10 +5,7 @@ ruby-platform:
     dir: docker/builds/x86_64-linux
     images:
       - slug: "ubuntu"
-        tag: "edge"
-        docker-platforms: ["linux/amd64"]
-      - slug: "centos"
-        tag: "edge-centos"
+        tag: "0.2.5"
         docker-platforms: ["linux/amd64"]
 
   - slug: "x86_64-linux-musl"
@@ -16,7 +13,7 @@ ruby-platform:
     dir: docker/builds/x86_64-linux-musl
     images:
       - slug: "ubuntu"
-        tag: "edge"
+        tag: "0.2.5"
         docker-platforms: ["linux/amd64"]
 
   - slug: "aarch64-linux"
@@ -24,7 +21,7 @@ ruby-platform:
     dir: docker/builds/aarch64-linux
     images:
       - slug: "ubuntu"
-        tag: "edge"
+        tag: "0.2.5"
         docker-platforms: ["linux/amd64"]
 
   - slug: "aarch64-linux-musl"
@@ -32,7 +29,7 @@ ruby-platform:
     dir: docker/builds/aarch64-linux-musl
     images:
       - slug: "ubuntu"
-        tag: "edge"
+        tag: "0.2.5"
         docker-platforms: ["linux/amd64"]
 
   - slug: "arm-linux"
@@ -40,7 +37,7 @@ ruby-platform:
     dir: docker/builds/arm-linux
     images:
       - slug: "ubuntu"
-        tag: "edge"
+        tag: "0.2.5"
         docker-platforms: ["linux/amd64"]
 
 ruby-version:

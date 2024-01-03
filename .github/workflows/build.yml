@@ -132,3 +132,4 @@ jobs:
             await Promise.all(tags.map((tag) => {
               return core.group(`Pushing ${tag}`, () => exec.exec(`docker push ${tag}`));
             }));
+
